@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KE & PE Simulation</title>
+    <style>
+        /* CSS for the simulation */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 10px;
+        }
+
+        #simulation-area, #controls, #info-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #simulation-area {
+            flex: 2 1 600px; /* Takes more space for canvas */
+            min-width: 400px;
+            position: relative;
+        }
+
+        #controls {
+            flex: 1 1 300px; /* For controls and info */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #info-panel {
+            flex: 1 1 300px;
+            border-left: 5px solid #007bff;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background: linear-gradient(to top, #b4e076 0%, #b4e076 20%, #87ceeb 20%, #87ceeb 100%);
+            display: block;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #resetButton {
+            background-color: #ff6347; /* Tomato */
+            color: white;
+        }
+
+        #resetButton:hover {
+            background-color: #e55337;
+        }
+
+        #energy-display {
+            font-family: monospace;
+            font-size: 1.2em;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .pe-value { color: green; }
+        .ke-value { color: blue; }
+        .total-value { color: black; }
+        .control-value { float: right; font-weight: normal; }
+
+        .tooltip-title {
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 10px;
+        }
+        .KE{
+            width: 500px;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Interactive Kinetic and Potential Energy Simulation</h1>
+
+    <div id="container">
+        <div id="simulation-area">
+            <canvas id="energyCanvas"></canvas>
+            <div id="energy-display">
+                <p>PE: <span id="peValue" class="pe-value">0.00 J</span></p>
+                <p>KE: <span id="keValue" class="ke-value">0.00 J</span></p>
+                <p>Total E: <span id="totalValue" class="total-value">0.00 J</span></p>
+            </div>
+        </div>
+
+        <div id="controls">
+            <h2>Controls</h2>
+            <div class="control-group">
+                <label for="massSlider">Mass (m): <span id="massValue" class="control-value">1 kg</span></label>
+                <input type="range" id="massSlider" min="0.1" max="5" value="1" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label for="gravitySlider">Gravity (g): <span id="gravityValue" class="control-value">9.8 m/s²</span></label>
+                <input type="range" id="gravitySlider" min="1" max="20" value="9.8" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label for="heightSlider">Initial Height (h₀): <span id="heightValue" class="control-value">300 px</span></label>
+                <input type="range" id="heightSlider" min="50" max="350" value="300" step="1">
+            </div>
+
+            <div class="control-group">
+                <label for="coeffSlider">Bounce Coefficient: <span id="coeffValue" class="control-value">0.8</span></label>
+                <input type="range" id="coeffSlider" min="0.1" max="1" value="0.8" step="0.05">
+            </div>
+
+            <button id="resetButton">Reset Simulation</button>
+        </div>
+        
+        <div id="info-panel">
+            <h2>Physics Tooltips</h2>
+            <p>This simulation demonstrates the conversion between **Potential Energy (PE)** and **Kinetic Energy (KE)** as a ball falls and bounces.</p>
+            
+            <p class="tooltip-title">Potential Energy (PE) </p>
+            
+            <p>Stored energy due to position. It is **maximum** at the highest point and **zero** at the ground (our reference point).</p>
+            
+            <p class="tooltip-title">Kinetic Energy (KE) <img id="KE" src="/assets/KEvsPE.png"/>  </p>
+          
+            <p>Energy of motion. It is **maximum** just before hitting the ground and **zero** at the highest points where the ball momentarily stops.</p>
+
+            <p class="tooltip-title">Total Energy</p>
+            <p>The sum of KE and PE. In a real-world bounce, the total energy **decreases** slightly due to energy loss (sound, heat) represented by the **Bounce Coefficient**.</p>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for the simulation
+        const canvas = document.getElementById('energyCanvas');
+        const ctx = canvas.getContext('2d');
+        const display = document.getElementById('energy-display');
+        const peValueSpan = document.getElementById('peValue');
+        const keValueSpan = document.getElementById('keValue');
+        const totalValueSpan = document.getElementById('totalValue');
+        const resetButton = document.getElementById('resetButton');
+
+        // Control Sliders
+        const massSlider = document.getElementById('massSlider');
+        const gravitySlider = document.getElementById('gravitySlider');
+        const heightSlider = document.getElementById('heightSlider');
+        const coeffSlider = document.getElementById('coeffSlider');
+
+        // Control Value Displays
+        const massValueDisplay = document.getElementById('massValue');
+        const gravityValueDisplay = document.getElementById('gravityValue');
+        const heightValueDisplay = document.getElementById('heightValue');
+        const coeffValueDisplay = document.getElementById('coeffValue');
+
+        // --- Simulation Parameters ---
+        let ball = {}; // Object to hold ball properties
+        let dt = 0.01; // Time step (for smooth physics)
+        const BALL_RADIUS = 10;
+        const GROUND_LEVEL = 400; // Fixed canvas height for ground (used for PE calculation)
+        const GRAPH_HISTORY_MAX = 300; // Number of points for the graph
+        let energyHistory = [];
+        let simulationTime = 0;
+
+        // Function to set up the canvas size (responsive)
+        function setupCanvas() {
+            const area = document.getElementById('simulation-area');
+            // Default max size 600x400, but responsive
+            canvas.width = Math.min(area.clientWidth - 40, 600);
+            canvas.height = 400;
+        }
+        window.addEventListener('resize', setupCanvas);
+        setupCanvas();
+
+        // Function to initialize or reset the ball state
+        function resetSimulation() {
+            const h0_px = parseFloat(heightSlider.value); // Initial height in Canvas Pixels (y-coordinate is inverted)
+            const g_val = parseFloat(gravitySlider.value);
+            const m_val = parseFloat(massSlider.value);
+            const coeff_val = parseFloat(coeffSlider.value);
+
+            // Canvas y=0 is top, y=canvas.height is bottom.
+            const initialY = canvas.height - h0_px - BALL_RADIUS;
+
+            ball = {
+                y: initialY, // Current Y position (top is 0)
+                vy: 0,       // Current Y velocity
+                m: m_val,    // Mass (kg)
+                g: g_val,    // Gravity (px/s²) - scaled for canvas
+                coeff: coeff_val, // Coefficient of restitution (0 to 1)
+                radius: BALL_RADIUS,
+                color: '#8a2be2' // BlueViolet
+            };
+            
+            // Reset state
+            energyHistory = [];
+            simulationTime = 0;
+            
+            // Initial draw before starting loop
+            drawSimulation(); 
+        }
+
+        // --- Physics & Calculations ---
+        function updatePhysics() {
+            // Apply gravity
+            ball.vy += ball.g * dt;
+            ball.y += ball.vy * dt;
+
+            // Check for collision with the ground (canvas.height)
+            const groundY = canvas.height - ball.radius;
+            if (ball.y > groundY) {
+                ball.y = groundY; // Reposition the ball on the ground
+                ball.vy *= -ball.coeff; // Reverse velocity and apply energy loss (bounce)
+                
+                // If velocity is very small, stop the ball to prevent infinite micro-bounces
+                if (Math.abs(ball.vy) < 0.5) {
+                    ball.vy = 0;
+                }
+            }
+        }
+
+        function calculateEnergy() {
+            // h is the height from the ground (reference point). In canvas coords, ground is canvas.height.
+            const h_px = (canvas.height - ball.radius) - ball.y; 
+
+            // Scale factor: Since we are using canvas pixels for h, m and g, the 'Energy'
+            // values will be proportional to actual Joules. We keep this internal unit
+            // for visualization and plotting.
+            const PE = ball.m * ball.g * h_px;
+            const KE = 0.5 * ball.m * ball.vy * ball.vy;
+            const TotalE = PE + KE;
+
+            // Update display
+            peValueSpan.textContent = PE.toFixed(2) + ' E-units';
+            keValueSpan.textContent = KE.toFixed(2) + ' E-units';
+            totalValueSpan.textContent = TotalE.toFixed(2) + ' E-units';
+
+            // Store history for graph
+            energyHistory.push({ pe: PE, ke: KE, total: TotalE, time: simulationTime });
+            if (energyHistory.length > GRAPH_HISTORY_MAX) {
+                energyHistory.shift(); // Remove oldest data point
+            }
+        }
+
+        // --- Drawing & Visualization ---
+        
+        const GRAPH_HEIGHT = 100;
+        const GRAPH_PADDING = 10;
+        const GRAPH_Y_START = canvas.height - GRAPH_HEIGHT - GRAPH_PADDING;
+
+        function drawGraph() {
+            // Draw background rectangle for the graph
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(0, GRAPH_Y_START - GRAPH_PADDING, canvas.width, GRAPH_HEIGHT + 2 * GRAPH_PADDING);
+            ctx.strokeStyle = '#ccc';
+            ctx.strokeRect(0, GRAPH_Y_START - GRAPH_PADDING, canvas.width, GRAPH_HEIGHT + 2 * GRAPH_PADDING);
+            
+            if (energyHistory.length < 2) return;
+
+            // Find max energy value for scaling the Y-axis of the graph
+            let maxEnergy = 0;
+            energyHistory.forEach(e => {
+                if (e.total > maxEnergy) maxEnergy = e.total;
+            });
+            const y_scale = maxEnergy > 0 ? GRAPH_HEIGHT / maxEnergy : 1;
+            const x_step = canvas.width / GRAPH_HISTORY_MAX;
+
+            // Function to get scaled Y coordinate for a given energy value
+            const getY = (energy) => GRAPH_Y_START + GRAPH_HEIGHT - (energy * y_scale);
+
+            // Draw Total Energy (Constant/Slowly Decreasing)
+            ctx.strokeStyle = 'black';
+            ctx.beginPath();
+            energyHistory.forEach((e, i) => {
+                const x = i * x_step;
+                const y = getY(e.total);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Draw Potential Energy (Green)
+            ctx.strokeStyle = 'green';
+            ctx.beginPath();
+            energyHistory.forEach((e, i) => {
+                const x = i * x_step;
+                const y = getY(e.pe);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Draw Kinetic Energy (Blue)
+            ctx.strokeStyle = 'blue';
+            ctx.beginPath();
+            energyHistory.forEach((e, i) => {
+                const x = i * x_step;
+                const y = getY(e.ke);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Add legend/labels
+            ctx.fillStyle = 'black';
+            ctx.font = '10px sans-serif';
+            ctx.fillText('PE (G)', 5, GRAPH_Y_START + 10);
+            ctx.fillText('KE (B)', 5, GRAPH_Y_START + 20);
+            ctx.fillText('Total (K)', 5, GRAPH_Y_START + 30);
+        }
+
+        function drawBall() {
+            // Draw the ball
+            ctx.fillStyle = ball.color;
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, ball.y + ball.radius, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawSimulation() {
+            // Clear the canvas. The background is set via CSS, but we clear for animation.
+            // Redrawing the background gradient here makes the canvas height dynamic relative to the graph.
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Redraw background to show ground/sky separation
+            const groundHeight = 80;
+            ctx.fillStyle = '#87ceeb'; // Sky
+            ctx.fillRect(0, 0, canvas.width, canvas.height - groundHeight);
+            ctx.fillStyle = '#b4e076'; // Ground
+            ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+            
+            drawBall();
+            drawGraph();
+        }
+
+        // --- Main Animation Loop ---
+        let lastTime = 0;
+        const FIXED_TIMESTEP = 1000 / 60; // Target 60 FPS
+
+        function animate(currentTime) {
+            if (!lastTime) lastTime = currentTime;
+            const elapsed = currentTime - lastTime;
+            lastTime = currentTime;
+            
+            // Run physics multiple times to keep up with the real elapsed time
+            // and ensure smooth, consistent movement regardless of frame rate.
+            let steps = 0;
+            let timeAccumulator = elapsed;
+
+            while (timeAccumulator > dt * 1000 && steps < 50) { // Limit steps to avoid spiral of death
+                updatePhysics();
+                calculateEnergy();
+                timeAccumulator -= dt * 1000;
+                simulationTime += dt;
+                steps++;
+            }
+            
+            drawSimulation();
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- Event Listeners and Initialization ---
+
+        // Function to handle slider changes and update display/simulation
+        function updateControl(event) {
+            const slider = event.target;
+            const value = parseFloat(slider.value).toFixed(slider.step == 1 ? 0 : 1);
+            
+            if (slider.id === 'massSlider') {
+                ball.m = parseFloat(slider.value);
+                massValueDisplay.textContent = value + ' kg';
+            } else if (slider.id === 'gravitySlider') {
+                ball.g = parseFloat(slider.value);
+                gravityValueDisplay.textContent = value + ' m/s²';
+            } else if (slider.id === 'heightSlider') {
+                heightValueDisplay.textContent = value + ' px';
+            } else if (slider.id === 'coeffSlider') {
+                ball.coeff = parseFloat(slider.value);
+                coeffValueDisplay.textContent = value;
+            }
+            
+            // Changes to mass or gravity require a hard reset to recalculate initial energy properly
+            if (slider.id === 'massSlider' || slider.id === 'gravitySlider' || slider.id === 'heightSlider') {
+                resetSimulation();
+            }
+        }
+
+        massSlider.addEventListener('input', updateControl);
+        gravitySlider.addEventListener('input', updateControl);
+        heightSlider.addEventListener('input', updateControl);
+        coeffSlider.addEventListener('input', updateControl);
+        resetButton.addEventListener('click', resetSimulation);
+
+        // Initial setup and start
+        resetSimulation();
+        animate(0);
+
+    </script>
+</body>
+</html>

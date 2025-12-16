@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Projectile Motion Simulator - Interactive Physics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e1b4b 100%);
+            overflow-x: hidden;
+        }
+        .glass {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        #canvas {
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .formula-card {
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.1));
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59,130,246,0.4);
+        }
+        .slider-track {
+            background: rgba(255,255,255,0.1);
+            height: 6px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white p-4 md:p-8">
+    <!-- Header -->
+    <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+            🎯 Projectile Motion
+        </h1>
+        <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto">
+            Master parabolic motion with interactive simulation | Class 11 Physics [web:13][web:14]
+        </p>
+        <div class="flex flex-wrap gap-2 justify-center mt-6 text-sm text-slate-400">
+            <span class="px-3 py-1 bg-blue-500/20 rounded-full border border-blue-500/30">Key Formulas</span>
+            <span class="px-3 py-1 bg-green-500/20 rounded-full border border-green-500/30">Real Physics</span>
+            <span class="px-3 py-1 bg-purple-500/20 rounded-full border border-purple-500/30">Interactive</span>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <!-- Theory Section -->
+        <div class="space-y-6 lg:sticky lg:top-8 lg:h-screen lg:overflow-y-auto">
+            <!-- Core Concepts -->
+            <section class="glass p-8 rounded-2xl glow">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-lg">📚</span>
+                    Core Concepts
+                </h2>
+                <div class="space-y-4 text-slate-300">
+                    <p>Projectile motion combines uniform horizontal motion with uniformly accelerated vertical motion under gravity (g = 9.8 m/s²). Horizontal velocity remains constant (vₓ = v₀cosθ), while vertical velocity changes (vᵧ = v₀sinθ - gt).[web:13][web:15]</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-blue-300">Horizontal Motion</h4>
+                            <div class="formula-card p-4 rounded-xl">
+                                <div class="text-lg font-mono mb-1">vₓ = v₀ × cosθ</div>
+                                <div class="text-lg font-mono">x = vₓ × t</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2 text-purple-300">Vertical Motion</h4>
+                            <div class="formula-card p-4 rounded-xl">
+                                <div class="text-lg font-mono mb-1">vᵧ = v₀ × sinθ - gt</div>
+                                <div class="text-lg font-mono">y = (v₀sinθ)t - ½gt²</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Key Formulas -->
+            <section class="glass p-8 rounded-2xl">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span class="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center text-lg">📐</span>
+                    Key Formulas
+                </h2>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div class="formula-card p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3 text-green-300">Time of Flight</h4>
+                        <div class="text-xl font-mono">T = <span class="text-2xl">2v₀sinθ / g</span></div>
+                    </div>
+                    <div class="formula-card p-4 rounded-xl">
+                        <h4 class="font-semibold mb-3 text-orange-300">Maximum Height</h4>
+                        <div class="text-xl font-mono">H = <span class="text-2xl">(v₀sinθ)² / 2g</span></div>
+                    </div>
+                    <div class="formula-card p-4 rounded-xl md:col-span-2">
+                        <h4 class="font-semibold mb-3 text-indigo-300">Range (Horizontal Distance)</h4>
+                        <div class="text-xl font-mono">R = <span class="text-2xl">v₀²sin2θ / g</span> (Max at θ=45°)</div>
+                    </div>
+                    <div class="formula-card p-4 rounded-xl md:col-span-2">
+                        <h4 class="font-semibold mb-3 text-pink-300">Trajectory Equation</h4>
+                        <div class="text-lg font-mono">y = x tanθ - <span class="text-xl">gx²/(2v₀²cos²θ)</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls Note -->
+            <div class="glass p-6 rounded-xl text-center">
+                <h3 class="text-xl font-semibold mb-3 text-yellow-300">🎮 Controls</h3>
+                <p class="text-slate-300 mb-4">Adjust velocity, angle, and gravity → Watch real-time changes!</p>
+                <div class="flex flex-wrap gap-2 justify-center text-xs bg-blue-500/20 p-3 rounded-lg">
+                    <span>🔴 Red trail = Actual path</span>
+                    <span>📐 Live angle display</span>
+                    <span>📏 Real-time range/height</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulation Section -->
+        <div class="space-y-6">
+            <!-- Canvas -->
+            <div class="glass p-4 rounded-2xl">
+                <canvas id="canvas" width="800" height="500" class="w-full max-w-4xl mx-auto block bg-gradient-to-b from-slate-900/50 to-slate-900/80"></canvas>
+            </div>
+
+            <!-- Controls -->
+            <div class="glass p-6 rounded-2xl space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Initial Velocity (m/s)</label>
+                        <input type="range" id="velocity" min="10" max="100" value="50" class="w-full h-2 rounded-lg slider-track cursor-pointer">
+                        <span id="velValue" class="text-lg font-bold text-blue-400">50 m/s</span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Angle (degrees)</label>
+                        <input type="range" id="angle" min="5" max="85" value="45" class="w-full h-2 rounded-lg slider-track cursor-pointer">
+                        <span id="angValue" class="text-lg font-bold text-purple-400">45°</span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-300">Gravity (m/s²)</label>
+                        <input type="range" id="gravity" min="5" max="15" value="9.8" step="0.1" class="w-full h-2 rounded-lg slider-track cursor-pointer">
+                        <span id="gravValue" class="text-lg font-bold text-orange-400">9.8 m/s²</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3 justify-center pt-4">
+                    <button onclick="launch()" class="btn-primary px-8 py-3 rounded-xl font-semibold text-lg flex items-center gap-2">
+                        🚀 Launch
+                    </button>
+                    <button onclick="reset()" class="px-8 py-3 border border-slate-500/50 rounded-xl hover:bg-slate-700/50 transition-all duration-300">
+                        🔄 Reset
+                    </button>
+                    <button onclick="togglePause()" id="pauseBtn" class="px-8 py-3 bg-green-500/20 border border-green-500/50 rounded-xl hover:bg-green-500/40 transition-all duration-300">
+                        ⏸️ Pause
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Data -->
+            <div class="glass p-6 rounded-2xl grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                    <div id="liveRange" class="text-2xl font-bold text-green-400">0 m</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wide">Range</div>
+                </div>
+                <div>
+                    <div id="liveHeight" class="text-2xl font-bold text-blue-400">0 m</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wide">Max Height</div>
+                </div>
+                <div>
+                    <div id="liveTime" class="text-2xl font-bold text-purple-400">0 s</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wide">Time of Flight</div>
+                </div>
+                <div>
+                    <div id="liveStatus" class="text-2xl font-bold text-yellow-400">Ready</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wide">Status</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800; canvas.height = 500;
+
+        let animationId;
+        let isPaused = false;
+        let particles = [];
+        let trail = [];
+
+        // Physics properties
+        let v0 = 50, theta = 45, g = 9.8;
+        let projectile = { x: 50, y: 400, vx: 0, vy: 0, launched: false };
+
+        // Ground level
+        const groundY = 400;
+
+        // Update display values
+        document.getElementById('velocity').addEventListener('input', (e) => {
+            v0 = parseFloat(e.target.value);
+            document.getElementById('velValue').textContent = `${v0.toFixed(0)} m/s`;
+        });
+        document.getElementById('angle').addEventListener('input', (e) => {
+            theta = parseFloat(e.target.value);
+            document.getElementById('angValue').textContent = `${theta}°`;
+        });
+        document.getElementById('gravity').addEventListener('input', (e) => {
+            g = parseFloat(e.target.value);
+            document.getElementById('gravValue').textContent = `${g} m/s²`;
+        });
+
+        function launch() {
+            const rad = theta * Math.PI / 180;
+            projectile.vx = v0 * Math.cos(rad);
+            projectile.vy = -v0 * Math.sin(rad); // Negative for upward
+            projectile.x = 50;
+            projectile.y = groundY;
+            projectile.launched = true;
+            trail = [];
+            updateLiveData();
+        }
+
+        function reset() {
+            cancelAnimationFrame(animationId);
+            projectile = { x: 50, y: groundY, vx: 0, vy: 0, launched: false };
+            particles = [];
+            trail = [];
+            isPaused = false;
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            updateLiveData();
+            draw();
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            document.getElementById('pauseBtn').textContent = isPaused ? '▶️ Resume' : '⏸️ Pause';
+        }
+
+        function updateLiveData() {
+            const rad = theta * Math.PI / 180;
+            const timeFlight = 2 * v0 * Math.sin(rad) / g;
+            const maxHeight = (v0 * Math.sin(rad)) ** 2 / (2 * g);
+            const range = v0 ** 2 * Math.sin(2 * rad) / g;
+            
+            document.getElementById('liveRange').textContent = `${range.toFixed(1)} m`;
+            document.getElementById('liveHeight').textContent = `${maxHeight.toFixed(1)} m`;
+            document.getElementById('liveTime').textContent = `${timeFlight.toFixed(1)} s`;
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Sky gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#1e3a8a');
+            gradient.addColorStop(1, '#1e1b4b');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Ground
+            ctx.fillStyle = 'linear-gradient(90deg, #4b5e40, #2d3748)';
+            ctx.fillRect(0, groundY + 20, canvas.width, canvas.height - groundY - 20);
+
+            if (projectile.launched && !isPaused) {
+                // Physics update
+                projectile.vy += g * 0.016; // delta time ~60fps
+                projectile.x += projectile.vx * 0.016 * 60;
+                projectile.y += projectile.vy * 0.016 * 60;
+
+                // Trail
+                trail.push({ x: projectile.x, y: projectile.y });
+                if (trail.length > 50) trail.shift();
+
+                // Ground collision
+                if (projectile.y >= groundY) {
+                    projectile.y = groundY;
+                    projectile.launched = false;
+                    document.getElementById('liveStatus').textContent = 'Landed';
+                    particles = [];
+                } else {
+                    // Particles
+                    if (Math.random() < 0.3) {
+                        particles.push({
+                            x: projectile.x,
+                            y: projectile.y,
+                            vx: (Math.random() - 0.5) * 2,
+                            vy: Math.random() * -1,
+                            life: 1
+                        });
+                    }
+                }
+
+                // Update particles
+                particles = particles.filter(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2;
+                    p.life -= 0.02;
+                    return p.life > 0;
+                });
+            }
+
+            // Draw trail
+            ctx.strokeStyle = 'rgba(255, 100, 100, 0.6)';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            trail.forEach((point, i) => {
+                if (i === 0) ctx.moveTo(point.x, point.y);
+                else ctx.lineTo(point.x, point.y);
+            });
+            ctx.stroke();
+
+            // Draw projectile
+            ctx.fillStyle = projectile.launched ? '#ff4444' : '#444';
+            ctx.shadowColor = '#ff4444';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(projectile.x, projectile.y, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Draw particles
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = '#ff6666';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // Axes & labels
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, groundY); ctx.lineTo(canvas.width - 50, groundY); // X-axis
+            ctx.moveTo(50, 50); ctx.lineTo(50, groundY); // Y-axis
+            ctx.stroke();
+
+            ctx.fillStyle = '#aaa';
+            ctx.font = '14px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('Range →', canvas.width/2, groundY + 25);
+            ctx.textAlign = 'right';
+            ctx.fillText('↑ Height', 45, 100);
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Start animation loop
+        animate();
+        updateLiveData();
+    </script>
+</body>
+</html>

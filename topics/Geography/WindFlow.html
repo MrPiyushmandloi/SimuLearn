@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>🌬️ Wind Flow Simulation - Physics Concepts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #0f172a;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .simulation-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: white;
+        }
+
+       
+        #simulationCanvas {
+    background-image: url('/assets/world map.PNG'); /* your image path */
+    background-size: cover; /* makes the image cover the entire canvas area */
+    background-position: center; /* centers the image */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+
+        #simulationCanvas:hover {
+            box-shadow: 0 0 30px rgba(59,130,246,0.3);
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #10b981, #3b82f6);
+        }
+
+        .wind-type-badge {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .physics-formula {
+            background: rgba(0,0,0,0.2);
+            font-family: 'Consolas', monospace;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .control-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%,-50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .control-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .simulation-container {
+                margin: 0;
+                border-radius: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="simulation-container">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-4">🌬️ Wind Flow Physics</h1>
+            <p class="text-xl md:text-2xl opacity-90 mb-2">Interactive Simulation for Class 9-11 Physics</p>
+            <div class="flex flex-wrap gap-2 justify-center text-sm md:text-base mt-4">
+                <span class="px-3 py-1 bg-white/20 rounded-full wind-type-badge">Bernoulli's Principle</span>
+                <span class="px-3 py-1 bg-white/20 rounded-full wind-type-badge">Pressure Gradients</span>
+                <span class="px-3 py-1 bg-white/20 rounded-full wind-type-badge">Coriolis Effect</span>
+                <span class="px-3 py-1 bg-white/20 rounded-full wind-type-badge">Streamlines</span>
+            </div>
+        </div>
+
+        <!-- Core Concepts Panel -->
+        <div class="p-8 bg-gradient-to-br from-slate-50 to-blue-50">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">🎯 Key Physics Concepts</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="concept-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold mb-4">💨 What is Wind?</h3>
+                    <ul class="space-y-3 text-lg leading-relaxed">
+                        <li>• <strong>Definition:</strong> Horizontal movement of air due to <span class="physics-formula">Pressure Gradient Force</span></li>
+                        <li>• <strong>Cause:</strong> High pressure → Low pressure movement (like water flowing downhill)</li>
+                        <li>• <strong>Formula:</strong> <span class="physics-formula">F = -∇P</span> (Force proportional to pressure gradient)</li>
+                        <li>• Wind speed ∝ 1/distance between pressure systems</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold mb-4">📐 Wind Patterns & Effects</h3>
+                    <ul class="space-y-3 text-lg leading-relaxed">
+                        <li>• <strong>Trade Winds:</strong> NE in Northern Hemisphere (0°-30°)</li>
+                        <li>• <strong>Westerlies:</strong> SW in mid-latitudes (30°-60°)</li>
+                        <li>• <strong>Cyclones:</strong> Clockwise in Southern Hemisphere</li>
+                        <li>• <strong>Monsoons:</strong> Seasonal reversal due to land-sea heating</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mt-6">
+                <div class="concept-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold mb-4">⚡ Benefits of Wind Patterns</h3>
+                    <ul class="space-y-2 text-lg">
+                        <li>• 🌍 <strong>Global Heat Distribution:</strong> Equator → Poles</li>
+                        <li>• 🌾 <strong>Agriculture:</strong> Monsoon rains for crops</li>
+                        <li>• ⚡ <strong>Wind Energy:</strong> Clean renewable power</li>
+                        <li>• 🛫 <strong>Aviation:</strong> Tailwinds save fuel</li>
+                        <li>• 🌊 <strong>Ocean Currents:</strong> Drives Gulf Stream, etc.</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold mb-4">🔬 Advanced Concepts</h3>
+                    <div class="space-y-3">
+                        <p><strong>Bernoulli's Principle:</strong> <span class="physics-formula">P + ½ρv² + ρgh = constant</span></p>
+                        <p class="text-sm"><em>Fast wind → Low pressure → Airplane lift</em></p>
+                        <p><strong>Coriolis Effect:</strong> Earth's rotation deflects wind</p>
+                        <p class="text-sm"><em>Right in NH, Left in SH (apparent force)</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <!--<div class="p-0">
+            
+            <canvas id="simulationCanvas" height="450" width="1000" class="w-full"></canvas>
+        </div>-->
+        <div class="relative w-full">
+    <!-- Background Image -->
+    <img 
+        src="/assets/world map.PNG" 
+        alt="Wind Flow Map" 
+        class="w-full h-auto object-cover select-none"
+        draggable="false"
+    />
+
+    <!-- Simulation Canvas -->
+    <canvas 
+        id="simulationCanvas" 
+        class="absolute inset-0 w-full h-full pointer-events-none"
+    ></canvas>
+</div>
+
+
+        <!-- Enhanced Controls -->
+        <div class="p-8 bg-white border-t border-gray-100">
+            <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-1" id="speedValue">2.0</div>
+                        <div class="text-sm text-gray-600 uppercase tracking-wide">m/s Speed</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-1" id="directionValue">East</div>
+                        <div class="text-sm text-gray-600 uppercase tracking-wide">Direction</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-purple-600 mb-1" id="particleDensity">150</div>
+                        <div class="text-sm text-gray-600 uppercase tracking-wide">Particles</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 justify-center lg:justify-end items-center">
+                    <button onclick="increaseSpeed()" class="control-btn bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-3 rounded-xl text-white font-semibold shadow-lg">⚡ Faster Wind</button>
+                    <button onclick="decreaseSpeed()" class="control-btn bg-gradient-to-r from-slate-500 to-gray-600 px-6 py-3 rounded-xl text-white font-semibold shadow-lg">🐌 Slower Wind</button>
+                    <button onclick="changeDirection()" class="control-btn bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-3 rounded-xl text-white font-semibold shadow-lg">🔄 New Direction</button>
+                    <button onclick="toggleParticles()" class="control-btn bg-gradient-to-r from-orange-500 to-red-600 px-6 py-3 rounded-xl text-white font-semibold shadow-lg">🎪 Particle Density</button>
+                    <button onclick="resetSimulation()" class="control-btn bg-gradient-to-r from-red-500 to-rose-600 px-6 py-3 rounded-xl text-white font-semibold shadow-lg">🔄 Reset All</button>
+                </div>
+            </div>
+
+            <div class="mt-8 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-2xl border border-dashed border-blue-200">
+                <h4 class="font-semibold text-lg mb-3 flex items-center gap-2">💡 Experiment Guide</h4>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>• Try <strong>High Speed + Random Direction</strong> → See turbulent wind patterns</div>
+                    <div>• <strong>Low Speed + Steady Direction</strong> → Laminar (smooth) flow</div>
+                    <div>• <strong>Change Direction rapidly</strong> → Watch particles curve (Coriolis effect simulation)</div>
+                    <div>• <strong>Observe trails</strong> → Visualize streamlines & wind paths</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script (module) -->
+    <script type="module">
+        // ---------- Firebase setup (optional) ----------
+        // Keeping your original structure but not required for simulation.
+        
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+            import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+            import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+            let db, auth, userId = 'anonymous';
+            const setupFirebase = async () => {
+                try {
+                    if (Object.keys(firebaseConfig).length > 0) {
+                        const app = initializeApp(firebaseConfig);
+                        setLogLevel('Debug');
+                        db = getFirestore(app);
+                        auth = getAuth(app);
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                        onAuthStateChanged(auth, (user) => {
+                            userId = user ? user.uid : 'anonymous';
+                        });
+                    }
+                } catch (error) {
+                    console.error("Firebase setup failed:", error);
+                }
+            };
+            setupFirebase();
+        
+
+        // ---------- Canvas + context ----------
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            // Make canvas width match container's computed width so canvas scales responsively
+            canvas.width = canvas.clientWidth || 1000;
+            canvas.height = 450;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // ---------- Particle system config ----------
+        const PARTICLE_LEVELS = [50, 100, 150, 250];
+        let currentParticleIndex = 2; // 150
+        let particles = [];
+
+        const SPEED_LEVELS = [0.5, 1.2, 2.5, 4.0, 6.5];
+        let currentSpeedIndex = 2; // medium
+        let windDirectionRad = 0; // current direction (radians)
+        let targetDirectionRad = 0; // where the wind will slowly turn to
+
+        const directionNames = ['East', 'NE', 'North', 'NW', 'West', 'SW', 'South', 'SE'];
+        function getDirectionName(rad) {
+            let angleDeg = (rad * 180 / Math.PI) % 360;
+            if (angleDeg < 0) angleDeg += 360;
+            const sector = Math.floor((angleDeg + 22.5) / 45) % 8;
+            return directionNames[sector];
+        }
+
+        // ---------- Particle class ----------
+        class EnhancedParticle {
+            constructor() {
+                this.reset();
+                this.size = Math.random() * 2.5 + 0.8;
+                this.baseOpacity = Math.random() * 0.4 + 0.4;
+                this.trailLength = Math.random() * 10 + 5;
+                this.speedVariation = Math.random() * 0.5 + 0.6;
+                // velocity
+                this.dx = 0;
+                this.dy = 0;
+            }
+
+            reset() {
+                // spawn at a random edge to make continuous flow
+                const edge = Math.floor(Math.random() * 4);
+                switch (edge) {
+                    case 0:
+                        this.x = -10;
+                        this.y = Math.random() * canvas.height;
+                        break;
+                    case 1:
+                        this.x = Math.random() * canvas.width;
+                        this.y = -10;
+                        break;
+                    case 2:
+                        this.x = canvas.width + 10;
+                        this.y = Math.random() * canvas.height;
+                        break;
+                    case 3:
+                    default:
+                        this.x = Math.random() * canvas.width;
+                        this.y = canvas.height + 10;
+                        break;
+                }
+                this.dx = Math.cos(windDirectionRad) * SPEED_LEVELS[currentSpeedIndex] * this.speedVariation;
+                this.dy = Math.sin(windDirectionRad) * SPEED_LEVELS[currentSpeedIndex] * this.speedVariation;
+                this.life = 1.0; // used for fading
+            }
+
+            update() {
+                // target velocity based on global wind direction & speed
+                const targetDx = Math.cos(windDirectionRad) * SPEED_LEVELS[currentSpeedIndex];
+                const targetDy = Math.sin(windDirectionRad) * SPEED_LEVELS[currentSpeedIndex];
+
+                // smoothly move the particle velocity towards the target (inertia)
+                this.dx += (targetDx * this.speedVariation - this.dx) * 0.08;
+                this.dy += (targetDy * this.speedVariation - this.dy) * 0.08;
+
+                // add small random turbulence so flow isn't perfectly straight
+                this.dx += (Math.random() - 0.5) * 0.06;
+                this.dy += (Math.random() - 0.5) * 0.06;
+
+                // update position
+                this.x += this.dx;
+                this.y += this.dy;
+
+                // life fades a bit each frame; when life low, reset particle
+                this.life -= 0.012 + Math.random() * 0.006;
+
+                if (this.x < -30 || this.x > canvas.width + 30 || this.y < -30 || this.y > canvas.height + 30 || this.life <= 0) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                // Draw small circle with alpha and color depending on x/time for slight hue variation
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.life * this.baseOpacity);
+                const hue = 210 + Math.sin((Date.now() * 0.001) + (this.x * 0.01)) * 18; // bluish hues
+                ctx.fillStyle = `hsl(${hue}, 75%, 60%)`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * Math.max(0.4, this.life), 0, Math.PI * 2);
+                ctx.fill();
+
+                // optional trailing stroke for more visible streamlines
+                ctx.globalAlpha = Math.max(0.05, this.life * 0.25);
+                ctx.lineWidth = Math.max(0.5, this.size * 0.25);
+                ctx.beginPath();
+                ctx.moveTo(this.x - this.dx * 1.5, this.y - this.dy * 1.5);
+                ctx.lineTo(this.x, this.y);
+                ctx.strokeStyle = `hsl(${hue}, 75%, 65%)`;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        // ---------- Particle system helpers ----------
+        function initParticles() {
+            particles = [];
+            const count = PARTICLE_LEVELS[currentParticleIndex];
+            for (let i = 0; i < count; i++) {
+                particles.push(new EnhancedParticle());
+            }
+            const pdEl = document.getElementById('particleDensity');
+            if (pdEl) pdEl.textContent = count;
+        }
+
+        // ---------- Animation loop ----------
+        function animate() {
+            // draw subtle background fade for trailing effect
+            ctx.fillStyle = 'rgba(11, 20, 36, 0.12)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // additional subtle overlay for depth
+            ctx.fillStyle = 'rgba(30, 58, 138, 0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // interpolate wind direction gently towards the target direction
+            const diff = targetDirectionRad - windDirectionRad;
+            // normalize difference to range -PI..PI
+            let diffNormalized = diff - (Math.round(diff / (Math.PI * 2)) * Math.PI * 2);
+            windDirectionRad += diffNormalized * 0.07; // smoothing factor
+
+            // update & draw particles
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+
+            // update UI numbers
+            const speedEl = document.getElementById('speedValue');
+            const dirEl = document.getElementById('directionValue');
+            if (speedEl) speedEl.textContent = SPEED_LEVELS[currentSpeedIndex].toFixed(1);
+            if (dirEl) dirEl.textContent = getDirectionName(windDirectionRad);
+
+            // next frame
+            requestAnimationFrame(animate);
+        }
+
+        // ---------- Control functions (global so buttons can call them) ----------
+        window.increaseSpeed = () => {
+            if (currentSpeedIndex < SPEED_LEVELS.length - 1) {
+                currentSpeedIndex++;
+            }
+        };
+
+        window.decreaseSpeed = () => {
+            if (currentSpeedIndex > 0) {
+                currentSpeedIndex--;
+            }
+        };
+
+        window.changeDirection = () => {
+            // pick a new random target direction (radians)
+            targetDirectionRad = Math.random() * Math.PI * 2;
+        };
+
+        window.toggleParticles = () => {
+            currentParticleIndex = (currentParticleIndex + 1) % PARTICLE_LEVELS.length;
+            initParticles();
+        };
+
+        window.resetSimulation = () => {
+            currentSpeedIndex = 2;
+            currentParticleIndex = 2;
+            windDirectionRad = 0;
+            targetDirectionRad = 0;
+            initParticles();
+        };
+
+        // ---------- Initialize on load ----------
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            initParticles();
+            animate();
+        });
+
+        // safeguard: if user resizes, re-init particle spawn positions (keeps density consistent)
+        window.addEventListener('resize', () => {
+            const oldCount = particles.length;
+            resizeCanvas();
+            // optionally preserve particle count
+            if (particles.length !== PARTICLE_LEVELS[currentParticleIndex]) {
+                initParticles();
+            } else {
+                // keep existing particles but clamp positions if outside
+                for (let p of particles) {
+                    if (p.x > canvas.width) p.x = Math.random() * canvas.width;
+                    if (p.y > canvas.height) p.y = Math.random() * canvas.height;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+

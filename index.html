@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulearn | Interactive Learning Simulations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <nav class="nav">
+                <div class="logo"> <img src="assets/logo5.png" alt="SimuLearn Logo">SimuLearn</div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#topics-section">Topics</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HOME SECTION -->
+    <section id="home">
+        <div class="container">
+            <div class="hero">
+                <div>
+                    <h1>Interactive Simulations for Students</h1>
+                    <p>Learn Physics, Math & Science through visual simulations and video explanations. Search topics and dive into interactive learning instantly.</p>
+                    <a href="#topics-section" class="cta">Explore Topics <span>→</span></a>
+                </div>
+
+                <div class="topics-panel" id="topics-section">
+                    <div class="panel-header">
+                        <div class="panel-title">📚 Simulation Library</div>
+                        <span class="topic-count" id="topic-count">4 topics</span>
+                    </div>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search" placeholder="Search simulations (forces, algebra, calculus...)">
+                    </div>
+                    <ul id="topics-list">
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Forces</h3>
+                                <p>Newton's laws, friction, gravity, motion</p>
+                            </div>
+                            <a href="topics/Physics/forces.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Algebra</h3>
+                                <p>Basic Arithmetic,Number Line
+                                
+                                </p>
+                            </div>
+                            <a href="topics/Maths/arithmatics.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Geography</h3>
+                                <p>Wind Flow,Bernauli Principle,Pressure</p>
+                            </div>
+                            <a href="topics/Geography/WindFlow.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Energy</h3>
+                                <p>Work Done, Enery conversion</p>
+                            </div>
+                            <a href="topics/Physics/EnergyTransfer.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                          <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Projectile Motion</h3>
+                                <p>Free Fall,Formulas,acceleration due to gtavity</p>
+                            </div>
+                            <a href="topics/Physics/ProjectlieMotion.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                         <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Motion In Plane</h3>
+                                <p>Defination,Scaler,Vector and Formulas</p>
+                            </div>
+                            <a href="topics/Physics/motionInPlane.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                         <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Atoms and Molecules</h3>
+                                <p>Defination,atoms,particles,compounds</p>
+                            </div>
+                            <a href="topics/Chemistry/AtomandMolecules.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                        <li class="topic-item">
+                            <div class="topic-info">
+                                <h3>Kinetic Vs Potential</h3>
+                                <p>Difference betweenthem and Formulas</p>
+                            </div>
+                            <a href="topics/Physics/KineticVsPotential.html" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                                <span class="topic-icon">▶</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about">
+        <div class="container">
+            <h2 class="section-title">About SimuLearn</h2>
+            <div class="about-content">
+                <p>SimuLearn transforms complex concepts into interactive visual experiences that make learning intuitive and fun. Our mission is to help students truly <strong>understand</strong> rather than memorize.</p>
+                <p>Every simulation is carefully designed by educators to reveal the hidden intuition behind mathematical and scientific concepts.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <span class="feature-icon">⚡</span>
+                        <h4>Real-Time Interaction</h4>
+                        <p>Adjust parameters and see results instantly</p>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📱</span>
+                        <h4>Works Everywhere</h4>
+                        <p>Perfect on phones, tablets, and desktops</p>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🎯</span>
+                        <h4>Topic Focused</h4>
+                        <p>Deep dive into individual concepts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-content">
+                <div class="contact-item">
+                    <span class="contact-icon">✉️</span>
+                    <div class="contact-text">
+                        <h4>hello@VidhyaCraft.com</h4>
+                        <p>For simulation requests & questions</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">📱</span>
+                    <div class="contact-text">
+                        <h4>+910000000</h4>
+                        <p>WhatsApp / Call support</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">🐦</span>
+                    <div class="contact-text">
+                        <h4>@SimuLearn</h4>
+                        <p>Follow for new simulations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>© 2025 VidhyaCraft. All rights reserved. | Made with ❤️ for students worldwide</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

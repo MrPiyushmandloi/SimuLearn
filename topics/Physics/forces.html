@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Force, Momentum & Energy Simulation</title>
+    <style>
+        :root {
+            --bg: #ecf0f1;
+            --card: #ffffff;
+            --accent: #3498db;
+            --accent-dark: #2c3e50;
+            --danger: #c0392b;
+            --success: #27ae60;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px 10px 40px;
+            color: var(--text-main);
+        }
+
+        h1, h2, h3 {
+            margin: 0 0 10px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--accent-dark);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        h2.subtitle {
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: var(--text-sub);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #physicsCanvas {
+            border: 4px solid #bdc3c7;
+            border-radius: 12px;
+            background: radial-gradient(circle at top, #ffffff 0, #f7f9fa 45%, #eef2f5 100%);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+            max-width: 100%;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 750px;
+            padding: 18px 20px;
+            margin-bottom: 18px;
+            background-color: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h3 {
+            color: var(--accent-dark);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .concept-list {
+            padding-left: 18px;
+            margin: 8px 0 12px;
+        }
+
+        .concept-list li {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: #e67e22;
+        }
+
+        .formula {
+            font-family: "Consolas", "Courier New", monospace;
+            background-color: #f4f6f8;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2.5fr) minmax(0, 1.8fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 700px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .controls-section label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .controls-section .row {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .controls-section input[type="number"],
+        .controls-section input[type="range"] {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .controls-section input[type="number"] {
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: 1px solid #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        .controls-section input[type="range"] {
+            accent-color: var(--accent);
+        }
+
+        .controls-section .value-badge {
+            font-size: 0.82rem;
+            background-color: #eef2f5;
+            padding: 2px 7px;
+            border-radius: 999px;
+            color: var(--accent-dark);
+        }
+
+        .buttons {
+            margin-top: 6px;
+        }
+
+        .buttons button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.2s ease;
+            margin: 4px 6px 4px 0;
+            font-size: 0.9rem;
+        }
+
+        .buttons button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18) inset;
+        }
+
+        #applyForceBtn {
+            background-color: var(--success);
+            color: #ffffff;
+        }
+
+        #resetSimBtn {
+            background-color: var(--danger);
+            color: #ffffff;
+        }
+
+        .buttons button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .readout {
+            font-size: 0.95rem;
+            margin: 4px 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .readout span.label {
+            font-weight: 600;
+        }
+
+        .readout span.value {
+            font-weight: 600;
+            color: var(--accent-dark);
+        }
+
+        .readout small {
+            color: var(--text-sub);
+            font-weight: 400;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: #eef2f5;
+            color: var(--accent-dark);
+            margin-left: 4px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-top: 8px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.blue {
+            background-color: #3498db;
+        }
+
+        .legend-dot.red {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Force, Momentum & Collision Simulation</h1>
+    <h2 class="subtitle">Explore inertia, momentum, kinetic energy, and Newton&apos;s laws with two colliding balls.</h2>
+
+    <canvas id="physicsCanvas" width="650" height="260"></canvas>
+
+    <div class="card">
+        <h3>Concepts in This Simulation</h3>
+        <ul class="concept-list">
+            <li><span class="highlight">Inertia &amp; Mass:</span> The blue ball has a larger mass than the red ball, so it has greater inertia and resists changes in motion more strongly.</li>
+            <li><span class="highlight">Unbalanced Force &amp; Impulse:</span> Clicking <span class="formula">Apply Force</span> gives the blue ball an initial velocity, modelling an impulse over a short time interval.</li>
+            <li><span class="highlight">Momentum (\(p\)):</span> Momentum is mass &times; velocity. The total momentum of the system is tracked before and after the collision.</li>
+            <li><span class="highlight">Conservation of Momentum:</span> In an isolated system, total momentum before collision equals total momentum after collision.</li>
+            <li><span class="highlight">Kinetic Energy (\(K\)):</span> Kinetic energy depends on the square of speed. After collision, notice how kinetic energy can redistribute between the balls.</li>
+            <li><span class="highlight">Newton&apos;s Third Law:</span> During impact, each ball exerts an equal and opposite force on the other, changing their velocities.</li>
+        </ul>
+    </div>
+
+    <div class="card controls-grid">
+        <div class="controls-section">
+            <h3>Adjust Physical Parameters</h3>
+            <div class="row">
+                <label for="mass1Input">Blue Ball Mass (kg)</label>
+                <input type="range" id="mass1Range" min="1" max="6" step="0.5" value="4" />
+                <span class="value-badge"><span id="mass1Value">4.0</span> kg</span>
+            </div>
+            <div class="row">
+                <label for="mass2Input">Red Ball Mass (kg)</label>
+                <input type="range" id="mass2Range" min="1" max="6" step="0.5" value="2" />
+                <span class="value-badge"><span id="mass2Value">2.0</span> kg</span>
+            </div>
+            <div class="row">
+                <label for="velocityInput">Initial Velocity of Blue Ball (m/s)</label>
+                <input type="range" id="velocityRange" min="0" max="8" step="0.5" value="3" />
+                <span class="value-badge"><span id="velocityValue">3.0</span> m/s</span>
+            </div>
+
+            <div class="buttons">
+                <button id="applyForceBtn" onclick="applyForce()">Apply Force (Start)</button>
+                <button id="resetSimBtn" onclick="resetSim()">Reset</button>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-dot blue"></span> Blue: Ball 1 (left, heavier)
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot red"></span> Red: Ball 2 (right, lighter)
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h3>Live Physics Readouts</h3>
+
+            <div class="readout">
+                <span class="label">Initial total momentum:</span>
+                <span class="value">
+                    <span id="initialMomentum">0.00</span> kg·m/s
+                </span>
+            </div>
+            <div class="readout">
+                <span class="label">Current total momentum:</span>
+                <span class="value">
+                    <span id="currentMomentum">0.00</span> kg·m/s
+                    <small>(should remain nearly constant)</small>
+                </span>
+            </div>
+
+            <div class="readout">
+                <span class="label">Initial total kinetic energy:</span>
+                <span class="value">
+                    <span id="initialEnergy">0.00</span> J
+                </span>
+            </div>
+            <div class="readout">
+                <span class="label">Current total kinetic energy:</span>
+                <span class="value">
+                    <span id="currentEnergy">0.00</span> J
+                    <small>(for a perfectly elastic collision)</small>
+                </span>
+            </div>
+
+            <p style="font-size:0.85rem; color:var(--text-sub); margin-top:10px;">
+                Tip: Try changing the masses and initial velocity, then restart the simulation.  
+                Observe how the final speeds change while total momentum stays almost constant.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- Canvas setup ---
+        const canvas = document.getElementById("physicsCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let animationFrameId;
+        let running = false;
+
+        // --- DOM elements for controls ---
+        const mass1Range = document.getElementById("mass1Range");
+        const mass2Range = document.getElementById("mass2Range");
+        const velocityRange = document.getElementById("velocityRange");
+        const mass1Value = document.getElementById("mass1Value");
+        const mass2Value = document.getElementById("mass2Value");
+        const velocityValue = document.getElementById("velocityValue");
+
+        const initialMomentumSpan = document.getElementById("initialMomentum");
+        const currentMomentumSpan = document.getElementById("currentMomentum");
+        const initialEnergySpan = document.getElementById("initialEnergy");
+        const currentEnergySpan = document.getElementById("currentEnergy");
+
+        const applyButton = document.getElementById("applyForceBtn");
+
+        // --- Ball objects ---
+        const baseY = canvas.height / 2;
+
+        let ball1 = {
+            x: 70,
+            y: baseY,
+            radius: 22,
+            mass: parseFloat(mass1Range.value),
+            color: "#3498db",
+            vx: 0,
+            vy: 0
+        };
+
+        let ball2 = {
+            x: canvas.width - 70,
+            y: baseY,
+            radius: 18,
+            mass: parseFloat(mass2Range.value),
+            color: "#e74c3c",
+            vx: 0,
+            vy: 0
+        };
+
+        let initialTotalMomentum = 0;
+        let initialTotalEnergy = 0;
+
+        // --- Utility functions ---
+        function updateControlLabels() {
+            mass1Value.textContent = parseFloat(mass1Range.value).toFixed(1);
+            mass2Value.textContent = parseFloat(mass2Range.value).toFixed(1);
+            velocityValue.textContent = parseFloat(velocityRange.value).toFixed(1);
+        }
+
+        function resetBallsToStart() {
+            ball1.x = 70;
+            ball1.y = baseY;
+            ball1.vx = 0;
+            ball1.vy = 0;
+            ball1.mass = parseFloat(mass1Range.value);
+
+            ball2.x = canvas.width - 70;
+            ball2.y = baseY;
+            ball2.vx = 0;
+            ball2.vy = 0;
+            ball2.mass = parseFloat(mass2Range.value);
+        }
+
+        function drawBall(ball) {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.fillStyle = "#000000";
+            ctx.font = "12px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(ball.mass.toFixed(1) + " kg", ball.x, ball.y - ball.radius - 6);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Baseline
+            ctx.strokeStyle = "#bdc3c7";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, baseY + 40);
+            ctx.lineTo(canvas.width, baseY + 40);
+            ctx.stroke();
+
+            drawBall(ball1);
+            drawBall(ball2);
+        }
+
+        function update() {
+            ball1.x += ball1.vx;
+            ball2.x += ball2.vx;
+        }
+
+        function handleWallBounce(ball) {
+            // Simple wall bounce at left and right edges
+            if (ball.x - ball.radius < 0) {
+                ball.x = ball.radius;
+                ball.vx *= -1;
+            } else if (ball.x + ball.radius > canvas.width) {
+                ball.x = canvas.width - ball.radius;
+                ball.vx *= -1;
+            }
+        }
+
+        function checkCollision() {
+            const dx = ball2.x - ball1.x;
+            const dy = ball2.y - ball1.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < ball1.radius + ball2.radius) {
+                // Separate overlapping balls along the line between centers
+                const overlap = (ball1.radius + ball2.radius) - distance;
+                const angle = Math.atan2(dy, dx);
+                const separationX = (overlap / 2) * Math.cos(angle);
+
+                ball1.x -= separationX;
+                ball2.x += separationX;
+
+                // 1D elastic collision along x-axis
+                const m1 = ball1.mass;
+                const m2 = ball2.mass;
+                const u1 = ball1.vx;
+                const u2 = ball2.vx;
+
+                const v1f = (u1 * (m1 - m2) + 2 * m2 * u2) / (m1 + m2);
+                const v2f = (u2 * (m2 - m1) + 2 * m1 * u1) / (m1 + m2);
+
+                ball1.vx = v1f;
+                ball2.vx = v2f;
+            }
+        }
+
+        function computeTotalMomentum() {
+            return ball1.mass * ball1.vx + ball2.mass * ball2.vx;
+        }
+
+        function computeTotalKineticEnergy() {
+            const k1 = 0.5 * ball1.mass * ball1.vx * ball1.vx;
+            const k2 = 0.5 * ball2.mass * ball2.vx * ball2.vx;
+            return k1 + k2;
+        }
+
+        function updateReadouts() {
+            const currentP = computeTotalMomentum();
+            const currentK = computeTotalKineticEnergy();
+
+            currentMomentumSpan.textContent = currentP.toFixed(2);
+            currentEnergySpan.textContent = currentK.toFixed(2);
+        }
+
+        // --- Main animation loop ---
+        function loop() {
+            update();
+            checkCollision();
+            handleWallBounce(ball1);
+            handleWallBounce(ball2);
+            draw();
+            updateReadouts();
+
+            // Stop if both balls are nearly at rest and far from start
+            const speed1 = Math.abs(ball1.vx);
+            const speed2 = Math.abs(ball2.vx);
+            if (speed1 < 0.01 && speed2 < 0.01 && running) {
+                running = false;
+                applyButton.disabled = false;
+                return;
+            }
+
+            animationFrameId = requestAnimationFrame(loop);
+        }
+
+        // --- User actions ---
+        function applyForce() {
+            if (running) return;
+
+            resetBallsToStart();
+
+            const initialVelocity = parseFloat(velocityRange.value);
+            ball1.vx = initialVelocity;
+            ball2.vx = 0;
+
+            initialTotalMomentum = computeTotalMomentum();
+            initialTotalEnergy = computeTotalKineticEnergy();
+
+            initialMomentumSpan.textContent = initialTotalMomentum.toFixed(2);
+            initialEnergySpan.textContent = initialTotalEnergy.toFixed(2);
+            currentMomentumSpan.textContent = initialTotalMomentum.toFixed(2);
+            currentEnergySpan.textContent = initialTotalEnergy.toFixed(2);
+
+            running = true;
+            applyButton.disabled = true;
+            loop();
+        }
+
+        function resetSim() {
+            cancelAnimationFrame(animationFrameId);
+            running = false;
+            applyButton.disabled = false;
+
+            resetBallsToStart();
+
+            initialTotalMomentum = 0;
+            initialTotalEnergy = 0;
+            initialMomentumSpan.textContent = "0.00";
+            currentMomentumSpan.textContent = "0.00";
+            initialEnergySpan.textContent = "0.00";
+            currentEnergySpan.textContent = "0.00";
+
+            draw();
+        }
+
+        // --- Hook up events ---
+        mass1Range.addEventListener("input", () => {
+            updateControlLabels();
+            if (!running) {
+                ball1.mass = parseFloat(mass1Range.value);
+                draw();
+            }
+        });
+
+        mass2Range.addEventListener("input", () => {
+            updateControlLabels();
+            if (!running) {
+                ball2.mass = parseFloat(mass2Range.value);
+                draw();
+            }
+        });
+
+        velocityRange.addEventListener("input", () => {
+            updateControlLabels();
+        });
+
+        // Initial UI setup
+        updateControlLabels();
+        resetBallsToStart();
+        draw();
+
+        // Make functions available globally for buttons
+        window.applyForce = applyForce;
+        window.resetSim = resetSim;
+    </script>
+</body>
+</html>

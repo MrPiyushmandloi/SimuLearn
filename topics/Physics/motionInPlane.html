@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Guide: Motion in a Plane - Scalars, Vectors & Simulation</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        canvas { border: 3px solid #fff; background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 70%, #228B22 100%); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .controls { background: rgba(255,255,255,0.95); padding: 20px; border-radius: 12px; margin: 15px 0; backdrop-filter: blur(10px); }
+        input[type="range"] { width: 200px; }
+        button { background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; margin: 5px; font-weight: bold; }
+        button:hover { background: #45a049; transform: scale(1.05); }
+        .section { background: rgba(255,255,255,0.95); margin: 20px 0; padding: 25px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); backdrop-filter: blur(10px); }
+        h1 { text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-size: 2.5em; margin-bottom: 10px; }
+        h2 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .formula { background: linear-gradient(90deg, #e3f2fd, #f3e5f5); padding: 20px; border-radius: 10px; border-left: 6px solid #2196F3; margin: 15px 0; font-family: 'Courier New', monospace; }
+        .key-concept { background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107; margin: 10px 0; }
+        .results { background: #d4edda; padding: 15px; border-radius: 8px; font-size: 1.2em; font-weight: bold; color: #155724; }
+        ul { line-height: 1.8; }
+        .vector-demo { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .demo-canvas { width: 200px; height: 150px; border: 2px solid #ddd; background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Motion in a Plane - Complete Learning Guide</h1>
+        
+        <div class="section">
+            <h2>🎯 Interactive Projectile Motion Simulator</h2>
+            <div class="controls">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <label>Initial Velocity (m/s): <input type="range" id="velocity" min="10" max="120" value="50"><span id="velValue">50</span></label><br>
+                        <label>Launch Angle (°): <input type="range" id="angle" min="5" max="85" value="45"><span id="angValue">45°</span></label>
+                    </div>
+                    <div>
+                        <label>Gravity (m/s²): <input type="range" id="gravity" min="5" max="15" value="9.8" step="0.1"><span id="gValue">9.8</span></label><br>
+                        <button onclick="resetSimulation()">🔄 Reset Simulation</button>
+                        <button onclick="togglePause()">⏸️ Pause/Play</button>
+                    </div>
+                </div>
+            </div>
+            <canvas id="canvas" width="1000" height="500"></canvas>
+            <div class="results">
+                Range: <span id="range">0</span>m | Max Height: <span id="height">0</span>m | Time of Flight: <span id="tof">0</span>s | 
+                Velocity Components: Vx=<span id="vx">0</span> m/s, Vy=<span id="vy">0</span> m/s [web:1]
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🛫 What is Motion in a Plane?</h2>
+            <div class="key-concept">
+                Motion in a plane is 2D motion where object moves in X-Y plane (not straight line, not 3D space).
+                Examples: Projectile motion, circular motion, boat crossing river [web:1][web:2]
+            </div>
+            <ul>
+                <li>Needs <strong>two coordinates</strong> (x, y) to describe position</li>
+                <li>Combines horizontal + vertical motion simultaneously</li>
+                <li>Key topics: Vectors, Projectile motion, Relative motion [web:1]</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>📏 Scalars - Complete Explanation</h2>
+            <div class="key-concept">
+                Scalars have <strong>only magnitude</strong>, no direction. Follow simple algebra rules.
+            </div>
+            <div class="formula">
+                <strong>Scalar Operations:</strong><br>
+                Addition: \( s = s_1 + s_2 \) [web:1]<br>
+                Subtraction: \( s = s_1 - s_2 \) [web:1]<br>
+                Multiplication: \( s = k \times s_1 \) (k = scalar) [web:1]
+            </div>
+            <ul>
+                <li><strong>Examples:</strong> Mass (5kg), Speed (20m/s), Distance (10m), Time (5s), Temperature (25°C)</li>
+                <li><strong>Key Point:</strong> 10m North + 10m South = 0m (NOT vectors!)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>➡️ Vectors - Complete Explanation</h2>
+            <div class="key-concept">
+                Vectors have <strong>magnitude AND direction</strong>. Represented by arrows (length = magnitude, arrow = direction).
+            </div>
+            <div class="vector-demo">
+                <canvas id="vectorDemo" class="demo-canvas"></canvas>
+                <div>
+                    <p><strong>Vector Notation:</strong> \(\vec{A} = 5\hat{i} + 3\hat{j}\) [web:1]</p>
+                    <p><strong>Magnitude:</strong> \( |\vec{A}| = \sqrt{A_x^2 + A_y^2} \) [web:1]</p>
+                </div>
+            </div>
+            
+            <div class="formula">
+                <strong>Vector Addition (Triangle Law):</strong><br>
+                \( \vec{R} = \vec{A} + \vec{B} \) [web:1]<br>
+                \( R = \sqrt{A^2 + B^2 + 2AB\cos\theta} \) [web:1]<br>
+                <strong>Vector Subtraction:</strong> \( \vec{A} - \vec{B} = \vec{A} + (-\vec{B}) \) [web:1]
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📐 Projectile Motion - All Formulas</h2>
+            <div class="formula">
+                <strong>1. Components of Initial Velocity:</strong><br>
+                \( v_{0x} = v_0 \cos\theta \), \( v_{0y} = v_0 \sin\theta \) [web:1]<br><br>
+                
+                <strong>2. Position Equations:</strong><br>
+                \( x = (v_0 \cos\theta) t \) [web:1]<br>
+                \( y = (v_0 \sin\theta) t - \frac{1}{2} g t^2 \) [web:1]<br><br>
+                
+                <strong>3. Key Results:</strong><br>
+                <strong>Time of Flight:</strong> \( T = \frac{2 v_0 \sin\theta}{g} \) [web:1]<br>
+                <strong>Maximum Range:</strong> \( R = \frac{v_0^2 \sin 2\theta}{g} \) (Max at θ = 45°) [web:1]<br>
+                <strong>Maximum Height:</strong> \( H = \frac{v_0^2 \sin^2\theta}{2g} \) [web:1]
+            </div>
+            <p class="key-concept">Trajectory is always <strong>parabola</strong>: \( y = x\tan\theta - \frac{gx^2}{2v_0^2\cos^2\theta} \)[web:1]</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Main Simulation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId, isPaused = false, t = 0, trail = [];
+        const scale = 12;
+
+        // Vector Demo
+        const vectorDemo = document.getElementById('vectorDemo');
+        const vctx = vectorDemo.getContext('2d');
+        drawVectorDemo();
+
+        function updateSliders() {
+            document.getElementById('velValue').textContent = document.getElementById('velocity').value;
+            document.getElementById('angValue').textContent = document.getElementById('angle').value + '°';
+            document.getElementById('gValue').textContent = document.getElementById('gravity').value;
+        }
+
+        ['velocity', 'angle', 'gravity'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateSliders);
+        });
+        updateSliders();
+
+        function resetSimulation() {
+            t = 0; trail = []; isPaused = false;
+            document.querySelectorAll('#range, #height, #tof, #vx, #vy').forEach(el => el.textContent = '0');
+            cancelAnimationFrame(animationId);
+            draw();
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            if (!isPaused) draw();
+        }
+
+        function calculateTrajectory(v0, theta, g) {
+            const rad = theta * Math.PI / 180;
+            const vx = v0 * Math.cos(rad);
+            const vy0 = v0 * Math.sin(rad);
+            const tof = 2 * vy0 / g;
+            const range = vx * tof;
+            const hmax = (vy0 * vy0) / (2 * g);
+            return { vx, vy0, tof, range, hmax, g };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Environment
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(0.7, '#98FB98');
+            gradient.addColorStop(1, '#228B22');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Ground & Axes
+            ctx.fillStyle = '#2E8B57';
+            ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+            ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(80, 80); ctx.lineTo(80, canvas.height - 60);
+            ctx.lineTo(canvas.width - 50, canvas.height - 60);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#1a1a1a'; ctx.font = 'bold 18px Arial';
+            ctx.fillText('Range (X)', canvas.width/2 - 30, canvas.height - 20);
+            ctx.fillText('Height (Y)', 20, canvas.height/2);
+            
+            const v0 = parseFloat(document.getElementById('velocity').value);
+            const theta = parseFloat(document.getElementById('angle').value);
+            const g = parseFloat(document.getElementById('gravity').value);
+            const { vx, vy0, tof, range, hmax } = calculateTrajectory(v0, theta, g);
+            
+            // Update results
+            if (t >= tof) {
+                document.getElementById('range').textContent = range.toFixed(1);
+                document.getElementById('height').textContent = hmax.toFixed(1);
+                document.getElementById('tof').textContent = tof.toFixed(2);
+                document.getElementById('vx').textContent = vx.toFixed(1);
+                document.getElementById('vy').textContent = vy0.toFixed(1);
+            }
+            
+            // Trajectory trail
+            trail.forEach((pos, i) => {
+                ctx.fillStyle = `rgba(255, 100, 100, ${0.3 + i/trail.length * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Current position
+            if (t <= tof) {
+                const x = 80 + vx * t * scale;
+                const y_pos = vy0 * t - 0.5 * g * t * t;
+                const y = canvas.height - 140 - y_pos * scale;
+                
+                if (y < canvas.height - 60) {
+                    trail.push({x, y});
+                    if (trail.length > 50) trail.shift();
+                    
+                    ctx.fillStyle = '#FF4444';
+                    ctx.shadowColor = 'rgba(255, 68, 68, 0.5)';
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+            
+            // Velocity vector (blue)
+            ctx.strokeStyle = '#0066CC'; ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            const curr_vx = vx;
+            const curr_vy = vy0 - g * t;
+            const mag = Math.sqrt(curr_vx**2 + curr_vy**2);
+            const vec_len = 80;
+            ctx.moveTo(80, canvas.height - 140);
+            ctx.lineTo(80 + (curr_vx/mag) * vec_len, canvas.height - 140 - (curr_vy/mag) * vec_len);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#0066CC'; ctx.font = 'bold 16px Arial';
+            ctx.fillText(`v₀=${v0}m/s ∠${theta}° | g=${g}m/s²`, 100, canvas.height - 160);
+            
+            if (!isPaused && t <= tof + 0.5) {
+                t += 0.03;
+                animationId = requestAnimationFrame(draw);
+            }
+        }
+
+        function drawVectorDemo() {
+            vctx.clearRect(0, 0, vectorDemo.width, vectorDemo.height);
+            vctx.strokeStyle = '#ddd'; vctx.lineWidth = 2;
+            vctx.beginPath(); vctx.moveTo(20, 130); vctx.lineTo(180, 130); vctx.lineTo(180, 20); vctx.stroke();
+            
+            // Vector A
+            vctx.strokeStyle = '#e74c3c'; vctx.lineWidth = 5; vctx.lineCap = 'round';
+            vctx.beginPath(); vctx.moveTo(30, 120); vctx.lineTo(100, 60); vctx.stroke();
+            vctx.fillStyle = '#e74c3c'; vctx.font = '14px Arial'; vctx.fillText('A', 95, 55);
+            
+            // Vector B
+            vctx.strokeStyle = '#3498db'; vctx.lineWidth = 5;
+            vctx.beginPath(); vctx.moveTo(100, 60); vctx.lineTo(160, 90); vctx.stroke();
+            vctx.fillStyle = '#3498db'; vctx.fillText('B', 155, 85);
+            
+            // Resultant
+            vctx.strokeStyle = '#27ae60'; vctx.lineWidth = 7;
+            vctx.beginPath(); vctx.moveTo(30, 120); vctx.lineTo(160, 90); vctx.stroke();
+            vctx.fillStyle = '#27ae60'; vctx.fillText('R = A+B', 140, 75);
+            
+            vctx.fillStyle = '#333'; vctx.font = 'bold 12px Arial';
+            vctx.fillText('Vector Addition (Triangle Law)', 20, 20);
+        }
+
+        draw();
+    </script>
+</body>
+</html>

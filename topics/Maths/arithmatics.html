@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Arithmetic Refresher Module</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#3498db',
+                        'secondary-red': '#e74c3c',
+                        'success-green': '#2ecc71',
+                        'neutral-gray': '#bdc3c7',
+                        'dark-text': '#2c3e50',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+        .container {
+            max-width: 1000px;
+        }
+        canvas {
+            border: 2px solid #34495e;
+            background-color: #fcfcfc;
+            border-radius: 8px;
+        }
+        /* Custom styles for the result block */
+        .result-block {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Style for the step-by-step box */
+        #stepExplanation {
+            min-height: 150px;
+            background-color: #ecf0f1;
+            border-left: 5px solid #3498db;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="container mx-auto">
+        <!-- 1. Top Section: Title, Concept, and Instructions -->
+        <header class="text-center mb-8 p-6 bg-white rounded-xl shadow-lg">
+            <h1 class="text-4xl font-extrabold text-dark-text mb-2">Basic Arithmetic Refresher Module</h1>
+            <p class="text-lg text-gray-600 mb-4">Master foundational concepts visually: Number Line, Addition, Subtraction, Multiplication, and Division.</p>
+            <div id="conceptExplanation" class="text-left bg-primary-blue/10 p-4 rounded-lg border border-primary-blue/30 text-dark-text">
+                <h3 class="text-xl font-bold mb-2 text-primary-blue">Concept: Select a mode below to begin.</h3>
+                <p id="dynamicExplanation">Use the tabs below to switch between arithmetic modes and explore the concepts!</p>
+            </div>
+        </header>
+
+        <!-- 2. Middle Section: Simulation Area -->
+        <div class="mb-8">
+            <!-- Tabs/Navigation for Concepts -->
+            <div class="flex justify-center space-x-2 sm:space-x-4 mb-4">
+                <button onclick="setMode('numberLine')" id="btn-numberLine" class="px-4 py-2 text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-200 bg-primary-blue text-white">Number Line</button>
+                <button onclick="setMode('addition')" id="btn-addition" class="px-4 py-2 text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-200 bg-neutral-gray text-dark-text hover:bg-neutral-gray/70">Addition</button>
+                <button onclick="setMode('subtraction')" id="btn-subtraction" class="px-4 py-2 text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-200 bg-neutral-gray text-dark-text hover:bg-neutral-gray/70">Subtraction</button>
+                <button onclick="setMode('multiplication')" id="btn-multiplication" class="px-4 py-2 text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-200 bg-neutral-gray text-dark-text hover:bg-neutral-gray/70">Multiplication</button>
+                <button onclick="setMode('division')" id="btn-division" class="px-4 py-2 text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-200 bg-neutral-gray text-dark-text hover:bg-neutral-gray/70">Division</button>
+            </div>
+            
+            <canvas id="arithmeticCanvas" width="960" height="250" class="w-full"></canvas>
+            
+            <div id="multiplicationBlocks" class="mt-4 p-4 bg-white rounded-lg shadow hidden">
+                <h4 class="text-lg font-semibold text-dark-text mb-2">Multiplication Groups Visualization:</h4>
+                <div id="blocksContainer" class="flex flex-wrap justify-center items-start gap-4 p-2">
+                    <!-- Blocks will be rendered here -->
+                </div>
+            </div>
+
+            <div id="divisionBlocks" class="mt-4 p-4 bg-white rounded-lg shadow hidden">
+                <h4 class="text-lg font-semibold text-dark-text mb-2">Division Sharing Visualization:</h4>
+                <div id="sharingContainer" class="flex flex-wrap justify-center items-start gap-4 p-2">
+                    <!-- Division visualization will be rendered here -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 3. Bottom Section: Controls and Step-by-step -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Input Controls -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-dark-text mb-4">Controls (<span id="currentOperation">Number Line</span>)</h3>
+                
+                <div id="inputControls" class="flex flex-wrap items-center gap-4 mb-4">
+                    <!-- Dynamic Inputs Here -->
+                    <div id="A_input_group">
+                        <label for="inputA" class="block text-sm font-medium text-gray-700">Value A:</label>
+                        <input type="number" id="inputA" value="5" min="-20" max="20" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-primary-blue focus:ring-primary-blue p-2">
+                    </div>
+                    <div id="B_input_group" class="hidden">
+                        <label for="inputB" class="block text-sm font-medium text-gray-700">Value B:</label>
+                        <input type="number" id="inputB" value="3" min="-20" max="20" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-primary-blue focus:ring-primary-blue p-2">
+                    </div>
+                </div>
+
+                <div id="numberLineControls" class="flex flex-wrap items-center gap-3 mb-4">
+                    <button onclick="moveMarker(1)" class="px-4 py-2 bg-primary-blue text-white rounded-full font-bold shadow-md hover:bg-primary-blue/80 transition">+1</button>
+                    <button onclick="moveMarker(-1)" class="px-4 py-2 bg-secondary-red text-white rounded-full font-bold shadow-md hover:bg-secondary-red/80 transition">-1</button>
+                    <button onclick="moveMarker(5)" class="px-4 py-2 bg-primary-blue text-white rounded-full font-bold shadow-md hover:bg-primary-blue/80 transition">+5</button>
+                    <button onclick="moveMarker(-5)" class="px-4 py-2 bg-secondary-red text-white rounded-full font-bold shadow-md hover:bg-secondary-red/80 transition">-5</button>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button onclick="startSimulation()" id="playButton" class="flex-1 px-6 py-3 bg-success-green text-white font-extrabold rounded-lg shadow-xl hover:bg-success-green/90 transition disabled:opacity-50" disabled>Run Simulation</button>
+                    <button onclick="resetSimulation()" class="flex-1 px-6 py-3 bg-neutral-gray text-dark-text font-extrabold rounded-lg shadow-xl hover:bg-neutral-gray/80 transition">Reset</button>
+                </div>
+
+                <div id="currentResult" class="mt-4 p-3 result-block bg-success-green/20 rounded-lg border-2 border-success-green text-dark-text">
+                    <p class="text-2xl font-bold">Current Value: <span id="markerValue">5</span></p>
+                </div>
+
+            </div>
+
+            <!-- Step-by-step Explanation -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-bold text-dark-text mb-4">Step-by-Step Guide</h3>
+                <div id="stepExplanation" class="p-4 rounded-md text-dark-text">
+                    <p class="font-bold mb-2">Welcome!</p>
+                    <p>Select an arithmetic mode to see the concepts visualized here step-by-step.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('arithmeticCanvas');
+        const ctx = canvas.getContext('2d');
+        const explainEl = document.getElementById('dynamicExplanation');
+        const stepExplainEl = document.getElementById('stepExplanation');
+        const markerValueEl = document.getElementById('markerValue');
+        const currentOpEl = document.getElementById('currentOperation');
+        const btnNumberLine = document.getElementById('btn-numberLine');
+        const blocksContainer = document.getElementById('blocksContainer');
+        const sharingContainer = document.getElementById('sharingContainer');
+        const multiBlocks = document.getElementById('multiplicationBlocks');
+        const divBlocks = document.getElementById('divisionBlocks');
+        const playButton = document.getElementById('playButton');
+        const inputA = document.getElementById('inputA');
+        const inputB = document.getElementById('inputB');
+        const inputAGroup = document.getElementById('A_input_group');
+        const inputBGroup = document.getElementById('B_input_group');
+        const nlControls = document.getElementById('numberLineControls');
+
+        // State Variables
+        const MIN_VAL = -20;
+        const MAX_VAL = 20;
+        let mode = 'numberLine';
+        let markerPos = 5;
+        let targetPos = 0;
+        let animationActive = false;
+        let animationStep = 0.5;
+
+        // Color definitions for easy theme adjustment
+        const COLORS = {
+            POSITIVE: '#3498db', // Blue
+            NEGATIVE: '#e74c3c', // Red
+            ZERO: '#34495e',     // Dark text
+            MARKER: '#f39c12',   // Orange
+            JUMP: '#2ecc71',     // Green
+            GRID: '#bdc3c7',     // Light gray
+            RESULT: '#2ecc71',
+        };
+
+        // --- Core Drawing Functions ---
+
+        /** Draws the main number line from MIN_VAL to MAX_VAL */
+        function drawNumberLine(highlightStart = null, highlightEnd = null) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const xOffset = 20;
+            const yCenter = canvas.height / 2;
+            const range = MAX_VAL - MIN_VAL;
+            const scale = (canvas.width - 2 * xOffset) / range;
+
+            // Draw horizontal line
+            ctx.beginPath();
+            ctx.moveTo(xOffset, yCenter);
+            ctx.lineTo(canvas.width - xOffset, yCenter);
+            ctx.strokeStyle = COLORS.ZERO;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Draw markers and labels
+            ctx.font = '12px Inter';
+            ctx.textAlign = 'center';
+            for (let i = MIN_VAL; i <= MAX_VAL; i++) {
+                const x = xOffset + (i - MIN_VAL) * scale;
+                
+                // Ticks
+                ctx.beginPath();
+                ctx.moveTo(x, yCenter - 5);
+                ctx.lineTo(x, yCenter + 5);
+                ctx.strokeStyle = (i === 0) ? COLORS.ZERO : COLORS.GRID;
+                ctx.lineWidth = (i % 5 === 0) ? 2 : 1;
+                ctx.stroke();
+
+                // Labels for every 5 units
+                if (i % 5 === 0 || i === MIN_VAL || i === MAX_VAL) {
+                    ctx.fillStyle = COLORS.ZERO;
+                    ctx.fillText(i, x, yCenter + 20);
+                }
+            }
+
+            // Highlight Jumps/Segments (for Addition/Subtraction)
+            if (highlightStart !== null && highlightEnd !== null) {
+                const startX = xOffset + (highlightStart - MIN_VAL) * scale;
+                const endX = xOffset + (highlightEnd - MIN_VAL) * scale;
+                const diff = highlightEnd - highlightStart;
+
+                // Draw Jump Arrow
+                ctx.strokeStyle = COLORS.JUMP;
+                ctx.fillStyle = COLORS.JUMP;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(startX, yCenter - 30);
+                ctx.lineTo(endX, yCenter - 30);
+                ctx.stroke();
+
+                // Arrowhead
+                ctx.beginPath();
+                if (diff > 0) { // Right Jump
+                    ctx.moveTo(endX, yCenter - 30);
+                    ctx.lineTo(endX - 10, yCenter - 35);
+                    ctx.lineTo(endX - 10, yCenter - 25);
+                } else { // Left Jump
+                    ctx.moveTo(endX, yCenter - 30);
+                    ctx.lineTo(endX + 10, yCenter - 35);
+                    ctx.lineTo(endX + 10, yCenter - 25);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                // Draw operation label above the jump
+                ctx.fillStyle = COLORS.JUMP;
+                ctx.fillText((diff > 0 ? "+" : "") + diff, (startX + endX) / 2, yCenter - 45);
+            }
+        }
+
+        /** Draws the moveable marker */
+        function drawMarker(currentValue) {
+            const xOffset = 20;
+            const yCenter = canvas.height / 2;
+            const range = MAX_VAL - MIN_VAL;
+            const scale = (canvas.width - 2 * xOffset) / range;
+            const x = xOffset + (currentValue - MIN_VAL) * scale;
+
+            // Draw Marker (Circle)
+            ctx.beginPath();
+            ctx.arc(x, yCenter - 15, 8, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.MARKER;
+            ctx.fill();
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = COLORS.MARKER;
+            ctx.font = '14px Inter Bold';
+            ctx.fillText(currentValue, x, yCenter - 25);
+        }
+
+        // --- Animation Logic ---
+
+        function animateJump(start, end, duration = 1000) {
+            if (animationActive) return; // Prevent double-clicking
+            animationActive = true;
+            
+            const startTime = performance.now();
+            const difference = end - start;
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Smooth interpolation for visual appeal
+                markerPos = start + difference * progress;
+
+                // Drawing logic (different based on mode)
+                if (mode === 'numberLine') {
+                    drawNumberLine();
+                } else {
+                    // Show the jump arrow during animation
+                    drawNumberLine(start, markerPos);
+                }
+                drawMarker(Math.round(markerPos)); // Round marker value for display
+
+                if (progress < 1) {
+                    animationFrameId = requestAnimationFrame(step);
+                } else {
+                    // Animation complete
+                    markerPos = end;
+                    markerValueEl.textContent = end;
+                    animationActive = false;
+                    
+                    // Final state draw
+                    if (mode !== 'numberLine') {
+                        // Draw final jump arrow on the number line
+                        drawNumberLine(start, end);
+                    } else {
+                        drawNumberLine(); // Clear jump line for NL mode
+                    }
+                    drawMarker(end); // Draw marker at final position
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(step);
+        }
+
+        // --- Mode Handlers ---
+
+        function setMode(newMode) {
+            mode = newMode;
+            resetSimulation(false); // Reset without full UI refresh
+
+            // Reset tab styles
+            const buttons = [btnNumberLine, ...document.querySelectorAll('.controls button:not(#playButton):not([onclick="resetSimulation()"])')];
+            buttons.forEach(btn => btn.className = btn.className.replace('bg-primary-blue text-white', 'bg-neutral-gray text-dark-text hover:bg-neutral-gray/70'));
+            
+            // Highlight current tab
+            document.getElementById(`btn-${newMode}`).className = document.getElementById(`btn-${newMode}`).className.replace('bg-neutral-gray text-dark-text hover:bg-neutral-gray/70', 'bg-primary-blue text-white');
+
+            // --- UI Visibility ---
+            const isNumberLine = (newMode === 'numberLine');
+            inputBGroup.classList.toggle('hidden', isNumberLine || newMode === 'division'); // Hide B for NL/Div, show for +/-/*
+            nlControls.classList.toggle('hidden', !isNumberLine); // Show NL controls only for NL mode
+            multiBlocks.classList.add('hidden');
+            divBlocks.classList.add('hidden');
+            blocksContainer.innerHTML = '';
+            sharingContainer.innerHTML = '';
+            playButton.disabled = isNumberLine;
+            
+            // Set input min/max for different operations
+            if (newMode === 'multiplication' || newMode === 'division') {
+                inputA.setAttribute('min', '0');
+                inputB.setAttribute('min', '1');
+            } else {
+                inputA.setAttribute('min', MIN_VAL);
+                inputB.setAttribute('min', MIN_VAL);
+            }
+
+            // --- Update UI and Explanations ---
+            currentOpEl.textContent = newMode.charAt(0).toUpperCase() + newMode.slice(1);
+            updateExplanation(newMode);
+            
+            // Set initial marker position
+            markerPos = parseInt(inputA.value);
+            drawNumberLine();
+            drawMarker(markerPos);
+            markerValueEl.textContent = markerPos;
+        }
+
+        function updateExplanation(currentMode) {
+            let conceptText = '';
+            let stepText = '';
+
+            switch (currentMode) {
+                case 'numberLine':
+                    conceptText = "The Number Line helps visualize integers. Positive numbers are to the right of 0, and Negative numbers are to the left.";
+                    stepText = "Use the buttons (+1, -1, +5, -5) to move the marker along the number line and see where you land!";
+                    break;
+                case 'addition':
+                    conceptText = "Addition (A + B) is movement on the number line. Adding a positive number (B) means moving B steps to the RIGHT. Adding a negative number means moving LEFT.";
+                    stepText = "1. Enter A and B. 2. Click Run. The animation starts at A and jumps by B units to the right (or left if B is negative).";
+                    break;
+                case 'subtraction':
+                    conceptText = "Subtraction (A - B) is the opposite of addition. Subtracting a positive number (B) means moving B steps to the LEFT. Subtracting a negative number means moving RIGHT.";
+                    stepText = "1. Enter A and B. 2. Click Run. The animation starts at A and jumps by B units to the left (or right if B is negative).";
+                    break;
+                case 'multiplication':
+                    conceptText = "Multiplication (A × B) is repeated addition. It means adding A (the size of the group) B times (the number of groups).";
+                    stepText = "1. Enter A (Group Size) and B (Number of Groups, min 1). 2. Click Run. Watch the groups of blocks build up, showing the repeated addition: A + A + ... (B times).";
+                    break;
+                case 'division':
+                    conceptText = "Division (A ÷ B) is the process of equal sharing or grouping. It asks: how many groups of size B can fit into A? (B is the divisor).";
+                    stepText = "1. Enter A (Total) and B (Group Size/Divisor, min 1). 2. Click Run. A total of A blocks will be distributed equally into B groups. Any leftover blocks represent the Remainder.";
+                    break;
+            }
+
+            explainEl.innerHTML = `<h3 class="text-xl font-bold mb-2 text-primary-blue">Concept: ${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}</h3><p>${conceptText}</p>`;
+            stepExplainEl.innerHTML = `<p class="font-bold mb-2">Instructions:</p><p>${stepText}</p>`;
+        }
+
+        // --- Action Handlers ---
+
+        function moveMarker(delta) {
+            if (animationActive) return;
+            const newPos = markerPos + delta;
+            if (newPos >= MIN_VAL && newPos <= MAX_VAL) {
+                animateJump(markerPos, newPos, 400);
+                markerPos = newPos; // This is redundant but ensures quick update for NL mode
+                markerValueEl.textContent = newPos;
+            } else {
+                stepExplainEl.innerHTML = `<p class="font-bold text-secondary-red">Error:</p><p>Cannot move past the number line boundaries (-20 to 20).</p>`;
+            }
+        }
+
+        function startSimulation() {
+            if (animationActive) return;
+            
+            const A = parseInt(inputA.value);
+            const B = parseInt(inputB.value || 0);
+            
+            if (isNaN(A) || (mode !== 'numberLine' && isNaN(B))) {
+                stepExplainEl.innerHTML = `<p class="font-bold text-secondary-red">Error:</p><p>Please enter valid numbers for A and B.</p>`;
+                return;
+            }
+
+            if (mode === 'addition' || mode === 'subtraction') {
+                runArithmetic(A, B);
+            } else if (mode === 'multiplication') {
+                runMultiplication(A, B);
+            } else if (mode === 'division') {
+                runDivision(A, B);
+            }
+        }
+
+        function runArithmetic(A, B) {
+            let finalResult;
+            let explanation = '';
+            let jump = B;
+
+            if (mode === 'addition') {
+                finalResult = A + B;
+                explanation = `Starting at **${A}** on the number line. We are **adding** ${B}. Adding means moving ${B >= 0 ? 'RIGHT' : 'LEFT'} by ${Math.abs(B)} steps.`;
+            } else if (mode === 'subtraction') {
+                finalResult = A - B;
+                jump = -B; // Subtraction is equivalent to adding the negative of B
+                explanation = `Starting at **${A}** on the number line. We are **subtracting** ${B}. Subtracting ${B} is the same as adding ${-B}, so we move ${jump >= 0 ? 'RIGHT' : 'LEFT'} by ${Math.abs(B)} steps.`;
+            }
+            
+            markerPos = A;
+            markerValueEl.textContent = A;
+            
+            // Clamp result within the visualization bounds
+            const finalVisualResult = Math.min(Math.max(finalResult, MIN_VAL), MAX_VAL);
+
+            stepExplainEl.innerHTML = `<p class="font-bold mb-2 text-primary-blue">Operation: ${mode.toUpperCase()}</p><p>${explanation}</p><p class="mt-2">The final result is: <span class="text-xl font-bold text-success-green">${finalResult}</span></p>`;
+            animateJump(A, finalVisualResult);
+        }
+
+        function runMultiplication(A, B) {
+            if (B <= 0) {
+                 stepExplainEl.innerHTML = `<p class="font-bold text-secondary-red">Error:</p><p>Number of Groups (B) must be 1 or greater for this model.</p>`;
+                 return;
+            }
+            
+            multiBlocks.classList.remove('hidden');
+            divBlocks.classList.add('hidden');
+            blocksContainer.innerHTML = '';
+
+            const result = A * B;
+            const stepText = [];
+            
+            stepText.push(`**Problem:** ${A} × ${B}. This means **${B} groups of ${A}**. (Repeated Addition)`);
+            
+            let currentSum = 0;
+            for (let i = 1; i <= B; i++) {
+                currentSum += A;
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'group p-3 border-2 border-primary-blue rounded-md shadow-md bg-primary-blue/10';
+                
+                let blockHTML = '';
+                for (let j = 0; j < Math.abs(A); j++) {
+                    const blockColor = A >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE;
+                    blockHTML += `<div style="width: 20px; height: 20px; background-color: ${blockColor}; margin: 2px; display: inline-block; border-radius: 4px;"></div>`;
+                }
+                groupDiv.innerHTML = `<p class="text-sm font-bold text-dark-text mb-1">Group ${i}</p>${blockHTML}`;
+                blocksContainer.appendChild(groupDiv);
+                
+                stepText.push(`Step ${i}: Add ${A}. Current total: ${currentSum}.`);
+            }
+
+            blocksContainer.innerHTML += `<div class="w-full text-center mt-4"><p class="text-2xl font-extrabold text-success-green">Final Result: ${result}</p></div>`;
+            stepExplainEl.innerHTML = stepText.map(t => `<p>${t}</p>`).join('');
+            
+            // Clear number line view
+            drawNumberLine();
+            drawMarker(0);
+            markerValueEl.textContent = 0;
+        }
+
+        function runDivision(A, B) {
+            if (B <= 0) {
+                 stepExplainEl.innerHTML = `<p class="font-bold text-secondary-red">Error:</p><p>Divisor (B) must be 1 or greater for this model.</p>`;
+                 return;
+            }
+            
+            multiBlocks.classList.add('hidden');
+            divBlocks.classList.remove('hidden');
+            sharingContainer.innerHTML = '';
+
+            const quotient = Math.floor(A / B);
+            const remainder = A % B;
+            
+            const stepText = [];
+            stepText.push(`**Problem:** ${A} ÷ ${B}. This means **sharing ${A} objects equally into ${B} groups**.`);
+            
+            // 1. Create B number of groups (boxes)
+            const groups = [];
+            for (let i = 0; i < B; i++) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'group p-3 border-2 border-primary-blue rounded-md shadow-md bg-primary-blue/10 w-1/4 min-w-[150px]';
+                groupDiv.innerHTML = `<p class="text-sm font-bold text-primary-blue mb-1">Group ${i + 1}</p><div class="blocks"></div>`;
+                sharingContainer.appendChild(groupDiv);
+                groups.push(groupDiv.querySelector('.blocks'));
+            }
+
+            // 2. Animate sharing (one by one, simplified)
+            let currentBlockCount = 0;
+            let currentItem = 0;
+            const totalItems = Math.abs(A);
+            const blockColor = A >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE;
+
+            // Simplified Animation: show the final state after distribution
+            
+            // Distribute quotient amount to each group
+            for (let i = 0; i < B; i++) {
+                for (let j = 0; j < quotient; j++) {
+                    const block = document.createElement('div');
+                    block.style.cssText = `width: 20px; height: 20px; background-color: ${blockColor}; margin: 2px; display: inline-block; border-radius: 4px;`;
+                    groups[i].appendChild(block);
+                }
+            }
+            
+            stepText.push(`**Step 1:** Distribute ${totalItems} objects equally into ${B} groups.`);
+            stepText.push(`**Step 2:** Each of the ${B} groups received **${quotient}** objects.`);
+
+            // Handle Remainder
+            if (remainder !== 0) {
+                const remainderDiv = document.createElement('div');
+                remainderDiv.className = 'w-full mt-4 p-4 border-2 border-secondary-red rounded-md bg-secondary-red/10 text-dark-text text-center';
+                let remainderBlockHTML = '';
+                for (let j = 0; j < remainder; j++) {
+                    remainderBlockHTML += `<div style="width: 20px; height: 20px; background-color: ${COLORS.NEGATIVE}; margin: 2px; display: inline-block; border-radius: 4px;"></div>`;
+                }
+                remainderDiv.innerHTML = `<p class="font-bold text-lg text-secondary-red">Remainder: ${remainder}</p>${remainderBlockHTML}`;
+                sharingContainer.appendChild(remainderDiv);
+                stepText.push(`**Step 3 (Remainder):** There are **${remainder}** objects left over that cannot be shared equally.`);
+            }
+
+            sharingContainer.innerHTML += `<div class="w-full text-center mt-4"><p class="text-2xl font-extrabold text-success-green">Final Result: Quotient ${quotient} (Remainder ${remainder})</p></div>`;
+            stepExplainEl.innerHTML = stepText.map(t => `<p>${t}</p>`).join('');
+
+            // Clear number line view
+            drawNumberLine();
+            drawMarker(0);
+            markerValueEl.textContent = 0;
+        }
+
+        function resetSimulation(full = true) {
+            cancelAnimationFrame(animationFrameId);
+            animationActive = false;
+            
+            if (full) {
+                inputA.value = 5;
+                inputB.value = 3;
+                setMode('numberLine');
+            }
+            
+            markerPos = parseInt(inputA.value);
+            markerValueEl.textContent = markerPos;
+            
+            drawNumberLine();
+            drawMarker(markerPos);
+            
+            blocksContainer.innerHTML = '';
+            sharingContainer.innerHTML = '';
+            multiBlocks.classList.add('hidden');
+            divBlocks.classList.add('hidden');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event listeners for inputs to re-enable the run button
+            inputA.addEventListener('input', () => { if (mode !== 'numberLine') playButton.disabled = false; });
+            inputB.addEventListener('input', () => { if (mode !== 'numberLine') playButton.disabled = false; });
+
+            // Initialize the default view
+            setMode('numberLine');
+        });
+    </script>
+</body>
+</html>

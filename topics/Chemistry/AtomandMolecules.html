@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atomic Structure: Complete Guide with Sodium Atom Simulation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23, #1a1a3d, #2d1b69);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        header {
+            background: rgba(255,215,0,0.1);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #FFD700;
+        }
+        h1 { 
+            color: #FFD700; 
+            font-size: 2.5em;
+            text-shadow: 0 0 20px #FFD700;
+            margin-bottom: 10px;
+        }
+        .subtitle { font-size: 1.2em; opacity: 0.9; }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .definitions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        .def-card {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,215,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .def-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255,215,0,0.3);
+        }
+        .def-card h2 {
+            color: #FFD700;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .def-card h2::before {
+            content: '⚛️';
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .simulation-section {
+            background: rgba(0,0,0,0.4);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            border: 2px solid #FFD700;
+        }
+        canvas {
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            background: radial-gradient(circle, #000428, #004e92);
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 0 50px rgba(255,215,0,0.6);
+            max-width: 100%;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #1e1e2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.6);
+        }
+
+        #info-panel {
+            background: rgba(0,0,0,0.5);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            border-left: 5px solid #FFD700;
+        }
+        #info-panel h3 { color: #FFD700; margin-bottom: 15px; }
+        .sodium-facts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .fact {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .concepts-section {
+            margin: 50px 0;
+        }
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .concept-card {
+            background: rgba(255,255,255,0.08);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .concept-card svg {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: block;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0,0,0,0.3);
+            margin-top: 50px;
+            border-top: 2px solid #FFD700;
+        }
+
+        @media (max-width: 768px) {
+            .definitions-grid, .concepts-grid { grid-template-columns: 1fr; }
+            canvas { width: 100%; height: 400px; }
+            h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Atomic Structure Fundamentals</h1>
+        <p class="subtitle">Interactive Learning: Atoms, Molecules, Compounds & Sodium Atom Simulation</p>
+    </header>
+
+    <div class="container">
+        <section class="definitions-grid">
+            <div class="def-card">
+                <h2>Atom</h2>
+                <p>The smallest unit of an element that retains its chemical properties. Consists of a dense nucleus (protons + neutrons) surrounded by orbiting electrons [web:1][web:2].</p>
+            </div>
+            <div class="def-card">
+                <h2>Molecule</h2>
+                <p>Two or more atoms chemically bonded together, representing the smallest unit of a compound that shows its characteristic properties [web:6][web:20].</p>
+            </div>
+            <div class="def-card">
+                <h2>Compound</h2>
+                <p>A pure substance formed when two or more different elements chemically combine in fixed proportions by mass [web:7][web:14].</p>
+            </div>
+            <div class="def-card">
+                <h2>Particle</h2>
+                <p>A minute portion of matter. In chemistry, refers to subatomic particles (electrons, protons, neutrons) or larger matter portions [web:8][web:15].</p>
+            </div>
+            <div class="def-card">
+                <h2>Electron</h2>
+                <p>Negatively charged subatomic particle orbiting the nucleus in electron shells. Determines chemical bonding and reactivity [web:9][web:16].</p>
+            </div>
+            <div class="def-card">
+                <h2>Proton & Neutron</h2>
+                <p><strong>Proton:</strong> Positively charged particle in nucleus (defines atomic number).<br><strong>Neutron:</strong> Neutral particle in nucleus (adds mass, stabilizes atom) [web:9][web:16].</p>
+            </div>
+        </section>
+
+        <section class="simulation-section">
+            <h2 style="color: #FFD700; margin-bottom: 30px; font-size: 2em;">🧪 Sodium Atom (Na) Simulation</h2>
+            
+            <div class="controls">
+                <button onclick="togglePause()">⏸️ Pause/Play</button>
+                <button onclick="resetView()">🔄 Reset</button>
+                <button onclick="speedUp()">⚡ Speed Up</button>
+                <button onclick="slowDown()">🐌 Slow Down</button>
+            </div>
+
+            <canvas id="atomCanvas" width="900" height="600"></canvas>
+
+            <div id="info-panel">
+                <h3>Sodium (Na) - Atomic Number 11 [web:10][web:17]</h3>
+                <p><strong>Electron Configuration:</strong> 2-8-1 (K:2, L:8, M:1 valence electrons)</p>
+                <p><strong>Nucleus:</strong> 11 Protons (red) + 12 Neutrons (blue) = Na-23 isotope</p>
+                <div class="sodium-facts">
+                    <div class="fact">
+                        <strong>Valence Shell</strong><br>
+                        3rd shell (M) with 1 electron<br>[web:11][web:38]
+                    </div>
+                    <div class="fact">
+                        <strong>Reactivity</strong><br>
+                        Highly reactive - loses 1 electron<br>forms Na⁺ ion
+                    </div>
+                    <div class="fact">
+                        <strong>Mass Number</strong><br>
+                        23 (11p + 12n)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="concepts-section">
+            <h2 style="text-align: center; color: #FFD700; font-size: 2.2em; margin-bottom: 40px;">Key Atomic Concepts</h2>
+            <div class="concepts-grid">
+                <div class="concept-card" style="color: #FF6B6B;">
+                    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="20" fill="currentColor" opacity="0.3"/></svg>
+                    <h3>Nucleus</h3>
+                    <p>Tiny, dense center containing nearly all atom's mass (protons + neutrons) [web:1].</p>
+                </div>
+                <div class="concept-card" style="color: #4ECDC4;">
+                    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="5,5"/></svg>
+                    <h3>Electron Shells</h3>
+                    <p>Energy levels where electrons orbit. Each shell holds max electrons: 2n² [web:37].</p>
+                </div>
+                <div class="concept-card" style="color: #45B7D1;">
+                    <svg viewBox="0 0 100 100"><circle cx="30" cy="30" r="6" fill="currentColor"/><circle cx="70" cy="70" r="6" fill="currentColor"/><circle cx="50" cy="50" r="3" fill="#FF6B6B"/></svg>
+                    <h3>Valence Electrons</h3>
+                    <p>Outermost shell electrons determine chemical properties and bonding [web:38].</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Interactive Educational Simulation | Built for Chemistry Learning | Sodium Atom (Na-23 Isotope) [web:18]</p>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('atomCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+        let paused = false;
+        let speed = 0.025;
+
+        // Sodium atom configuration (Na-23 isotope)
+        const nucleus = { x: 450, y: 300, r: 35 };
+        const protons = 11;
+        const neutrons = 12;
+        
+        const shells = [
+            { r: 90, electrons: 2, angle: 0, color: '#00FF88', label: 'K (2e⁻)' },   // 1st shell
+            { r: 170, electrons: 8, angle: 0, color: '#00CCFF', label: 'L (8e⁻)' },  // 2nd shell
+            { r: 260, electrons: 1, angle: 0, color: '#FFAA00', label: 'M (1e⁻)', isValence: true }  // 3rd valence shell
+        ];
+
+        // Nucleus particles (protons & neutrons)
+        const nucParticles = [];
+        for(let i = 0; i < protons; i++) 
+            nucParticles.push({type: 'p', angle: Math.random() * Math.PI * 2, vx: (Math.random()-0.5)*0.02});
+        for(let i = 0; i < neutrons; i++) 
+            nucParticles.push({type: 'n', angle: Math.random() * Math.PI * 2, vx: (Math.random()-0.5)*0.02});
+
+        function drawNucleus() {
+            // Nucleus glow
+            const gradient = ctx.createRadialGradient(nucleus.x, nucleus.y, 0, nucleus.x, nucleus.y, nucleus.r + 20);
+            gradient.addColorStop(0, 'rgba(255,100,100,0.6)');
+            gradient.addColorStop(0.7, 'rgba(100,100,255,0.4)');
+            gradient.addColorStop(1, 'rgba(50,50,50,0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(nucleus.x, nucleus.y, nucleus.r + 20, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nucleus core
+            ctx.fillStyle = '#2a2a2a';
+            ctx.beginPath();
+            ctx.arc(nucleus.x, nucleus.y, nucleus.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Protons (red) & Neutrons (blue) with slight vibration
+            nucParticles.forEach(p => {
+                p.angle += p.vx;
+                const px = nucleus.x + Math.cos(p.angle) * (nucleus.r * 0.7);
+                const py = nucleus.y + Math.sin(p.angle) * (nucleus.r * 0.7);
+                
+                ctx.shadowColor = p.type === 'p' ? '#FF4444' : '#4444FF';
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = p.type === 'p' ? '#FF6666' : '#6666FF';
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function drawShells() {
+            shells.forEach((shell, i) => {
+                // Shell orbit path with glow
+                ctx.shadowColor = shell.color;
+                ctx.shadowBlur = 15;
+                ctx.strokeStyle = shell.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(nucleus.x, nucleus.y, shell.r, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Electrons orbiting
+                for(let j = 0; j < shell.electrons; j++) {
+                    const angle = shell.angle + (j / shell.electrons) * Math.PI * 2;
+                    const ex = nucleus.x + Math.cos(angle) * shell.r;
+                    const ey = nucleus.y + Math.sin(angle) * shell.r;
+                    
+                    // Electron glow
+                    ctx.shadowColor = shell.color;
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = shell.color;
+                    ctx.beginPath();
+                    ctx.arc(ex, ey, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Electron core
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.beginPath();
+                    ctx.arc(ex, ey, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Highlight valence electron
+                    if(shell.isValence) {
+                        ctx.strokeStyle = '#FFFF00';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(ex, ey, 12, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                }
+                ctx.shadowBlur = 0;
+
+                // Shell label
+                ctx.fillStyle = shell.color;
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(shell.label, nucleus.x + shell.r + 20, nucleus.y - 5);
+            });
+        }
+
+        function drawLegend() {
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('🔴 Protons (+)', 50, 50);
+            ctx.fillText('🔵 Neutrons (0)', 50, 75);
+            ctx.fillText('🟢 K Shell (n=1)', 50, 110);
+            ctx.fillText('🔵 L Shell (n=2)', 50, 135);
+            ctx.fillText('🟡 M Shell (Valence)', 50, 160);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawNucleus();
+            drawShells();
+            drawLegend();
+            
+            // Update shell rotations
+            shells.forEach(shell => {
+                shell.angle += speed;
+            });
+
+            if (!paused) {
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+
+        // Controls
+        function togglePause() {
+            paused = !paused;
+            if (!paused) animate();
+        }
+
+        function resetView() {
+            shells.forEach(shell => shell.angle = 0);
+            nucParticles.forEach(p => {
+                p.angle = Math.random() * Math.PI * 2;
+                p.vx = (Math.random()-0.5)*0.02;
+            });
+            speed = 0.025;
+            if (!paused) animate();
+        }
+
+        function speedUp() { speed = Math.min(speed * 1.5, 0.15); }
+        function slowDown() { speed = Math.max(speed * 0.7, 0.005); }
+
+        // Responsive canvas
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            nucleus.x = canvas.width / 2;
+            nucleus.y = canvas.height / 2;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ Work, Power & Energy Transfer Simulation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body {
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+    }
+
+    .simulation-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 25px 60px rgba(15,23,42,0.5);
+        border: 1px solid rgba(148,163,184,0.2);
+    }
+
+    #backgroundImage {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        display: block;
+    }
+
+    #simulationCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 100%);
+        justify-items: center;
+    }
+
+    .control-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.5rem 1rem;
+        background: rgba(255,255,255,0.95);
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(15,23,42,0.15);
+        border: 1px solid rgba(59,130,246,0.2);
+        min-width: 180px;
+        transition: transform 0.2s ease;
+    }
+
+    .control-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .control-item label {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 0.95rem;
+        text-align: center;
+    }
+
+    .slider {
+        width: 160px;
+        height: 6px;
+        border-radius: 3px;
+        accent-color: #3b82f6;
+        cursor: pointer;
+    }
+
+    .control-value {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #1e40af;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        border: 2px solid #3b82f6;
+        box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    }
+
+    .info-panel {
+        padding: 2rem;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(251,191,36,0.3);
+        border: 2px solid rgba(251,191,36,0.4);
+        text-align: center;
+        transition: transform 0.2s ease;
+    }
+
+    .info-card:hover {
+        transform: scale(1.02);
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #92400e;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #b45309;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-unit {
+        font-size: 0.9rem;
+        color: #92400e;
+        font-weight: 600;
+    }
+
+    /* Concepts Section */
+    .concepts-section {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: #f1f5f9;
+        padding: 3rem 2rem;
+    }
+
+    .concept-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .concept-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #031b3a, #030203);
+        
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .concept-subtitle {
+        font-size: 1.2rem;
+        color: #cbd5e1;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .definitions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .definition-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .definition-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #ec4899, #10b981);
+    }
+
+    .definition-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .definition-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #f8fafc;
+        margin-bottom: 1rem;
+    }
+
+    .formula {
+        background: rgba(15,23,42,0.8);
+        border: 1px solid #475569;
+        border-radius: 0.75rem;
+        padding: 1rem 1.5rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #60a5fa;
+        margin: 1rem 0;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .key-notes {
+        background: rgba(16,185,129,0.2);
+        border: 1px solid rgba(16,185,129,0.4);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        margin-top: 1.5rem;
+    }
+
+    .note-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .note-icon {
+        background: #10b981;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    .btn-start {
+        display: block;
+        margin: 0 auto;
+        padding: 1rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        border-radius: 9999px;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(59,130,246,0.4);
+        transition: all 0.3s ease;
+    }
+
+    .btn-start:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(59,130,246,0.6);
+    }
+
+    .btn-row {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+        padding: 0.75rem 2rem;
+        background: rgba(255,255,255,0.2);
+        color: #f1f5f9;
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 9999px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .ct{
+        font-size: 3rem;
+        font-weight: 900;
+       
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .controls {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+        .info-panel {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+        .concept-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- Concepts & Theory Section -->
+<section class="concepts-section">
+    <div class="concept-header">
+         <h1 class="ct">Work • Power • Energy</h1>
+        <h1 class="concept-title">Work • Power • Energy</h1>
+        <p class="concept-subtitle">Master the fundamental concepts before diving into the interactive simulation</p>
+    </div>
+
+    <div class="definitions-grid">
+        <div class="definition-card">
+            <div class="definition-icon">⚡</div>
+            <h3 class="definition-title">Work Done (W)</h3>
+            <div class="formula">W = F × d × cos(θ)</div>
+            <p><strong>Definition:</strong> Work is done when a force causes displacement in the direction of the force.</p>
+            
+            <div class="key-notes">
+                <h4 style="color: #10b981; font-weight: 700; margin-bottom: 0.75rem;">Key Points:</h4>
+                <div class="note-item">
+                    <div class="note-icon">1</div>
+                    <div>No displacement = No work (even with force applied)</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">2</div>
+                    <div>Only <strong>component of force</strong> parallel to displacement counts</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">3</div>
+                    <div>Unit: <strong>Joule (J)</strong> = N × m</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="definition-card">
+            <div class="definition-icon">🚀</div>
+            <h3 class="definition-title">Power (P)</h3>
+            <div class="formula">P = W / t  or  P = F × v</div>
+            <p><strong>Definition:</strong> Rate of doing work or energy transfer per unit time.</p>
+            
+            <div class="key-notes">
+                <h4 style="color: #10b981; font-weight: 700; margin-bottom: 0.75rem;">Key Points:</h4>
+                <div class="note-item">
+                    <div class="note-icon">1</div>
+                    <div>Same work in less time = Higher power</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">2</div>
+                    <div>Unit: <strong>Watt (W)</strong> = J/s</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">3</div>
+                    <div>1 horsepower = 746 W</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="definition-card">
+            <div class="definition-icon">🔋</div>
+            <h3 class="definition-title">Kinetic Energy (KE)</h3>
+            <div class="formula">KE = ½ × m × v²</div>
+            <p><strong>Definition:</strong> Energy of motion. Depends on mass and velocity squared.</p>
+            
+            <div class="key-notes">
+                <h4 style="color: #10b981; font-weight: 700; margin-bottom: 0.75rem;">Key Points:</h4>
+                <div class="note-item">
+                    <div class="note-icon">1</div>
+                    <div>Velocity has <strong>quadratic effect</strong> (double speed = 4x energy)</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">2</div>
+                    <div>Work done = Change in KE (Work-Energy Theorem)</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">3</div>
+                    <div>Unit: <strong>Joule (J)</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="definition-card">
+            <div class="definition-icon">🏔️</div>
+            <h3 class="definition-title">Potential Energy (PE)</h3>
+            <div class="formula">PE = m × g × h</div>
+            <p><strong>Definition:</strong> Stored energy due to position/height above reference level.</p>
+            
+            <div class="key-notes">
+                <h4 style="color: #10b981; font-weight: 700; margin-bottom: 0.75rem;">Key Points:</h4>
+                <div class="note-item">
+                    <div class="note-icon">1</div>
+                    <div>Reference level is <strong>arbitrary</strong> (usually ground)</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">2</div>
+                    <div>g = 9.8 m/s² (Earth's gravity)</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-icon">3</div>
+                    <div>Unit: <strong>Joule (J)</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-row">
+        <button class="btn-start" onclick="startSimulation()">🚀 Start Interactive Simulation</button>
+        <button class="btn-secondary" onclick="resetAll()">🔄 Reset Everything</button>
+    </div>
+</section>
+
+<!-- Simulation Section -->
+<div class="simulation-container" id="simulationSection" style="display: none;">
+    <!-- Background image -->
+    <div style="position: relative;">
+        <img src="https://etc.usf.edu/clipart/76000/76035/76035_bold_d_line_lg.gif"  id="backgroundImage">
+        <canvas id="simulationCanvas"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="control-item">
+            <label>💪 Applied Force</label>
+            <input type="range" min="1" max="50" value="20" id="forceSlider" class="slider">
+            <div class="control-value" id="forceValue">20 <span style="font-size: 0.8em;">N</span></div>
+        </div>
+        <div class="control-item">
+            <label>📐 Force Angle</label>
+            <input type="range" min="0" max="90" value="30" id="angleSlider" class="slider">
+            <div class="control-value" id="angleValue">30°</div>
+        </div>
+        <div class="control-item">
+            <label>⚖️ Block Mass</label>
+            <input type="range" min="1" max="20" value="5" id="massSlider" class="slider">
+            <div class="control-value" id="massValue">5 <span style="font-size: 0.8em;">kg</span></div>
+        </div>
+    </div>
+
+    <!-- Real-time Calculations -->
+    <div class="info-panel">
+        <div class="info-card">
+            <div class="info-label">Work Done</div>
+            <div class="info-value" id="workValue">0</div>
+            <div class="info-unit">Joules (J)</div>
+        </div>
+        <div class="info-card">
+            <div class="info-label">Power</div>
+            <div class="info-value" id="powerValue">0</div>
+            <div class="info-unit">Watts (W)</div>
+        </div>
+        <div class="info-card">
+            <div class="info-label">Kinetic Energy</div>
+            <div class="info-value" id="keValue">0</div>
+            <div class="info-unit">Joules (J)</div>
+        </div>
+        <div class="info-card">
+            <div class="info-label">Potential Energy</div>
+            <div class="info-value" id="peValue">0</div>
+            <div class="info-unit">Joules (J)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+let isSimulating = false;
+let animationId = null;
+
+// Simulation elements
+const canvas = document.getElementById('simulationCanvas');
+const ctx = canvas.getContext('2d');
+const bgImage = document.getElementById('backgroundImage');
+
+// Block properties
+let block = {
+    x: 100,
+    y: 420,
+    width: 50,
+    height: 50,
+    color: '#ef4444',
+    vx: 0,
+    vy: 0,
+    trail: []
+};
+
+// Simulation parameters
+let force = 20;
+let angleDeg = 30;
+let mass = 5;
+let totalDistance = 0;
+let startTime = 0;
+let prevTime = 0;
+
+// DOM elements
+const sliders = {
+    force: document.getElementById('forceSlider'),
+    angle: document.getElementById('angleSlider'),
+    mass: document.getElementById('massSlider')
+};
+
+const displays = {
+    force: document.getElementById('forceValue'),
+    angle: document.getElementById('angleValue'),
+    mass: document.getElementById('massValue'),
+    work: document.getElementById('workValue'),
+    power: document.getElementById('powerValue'),
+    ke: document.getElementById('keValue'),
+    pe: document.getElementById('peValue')
+};
+
+// Initialize canvas
+function resizeCanvas() {
+    if (!bgImage.complete) return;
+    canvas.width = bgImage.clientWidth;
+    canvas.height = bgImage.clientHeight;
+}
+
+// Event Listeners
+sliders.force.oninput = () => updateForce();
+sliders.angle.oninput = () => updateAngle();
+sliders.mass.oninput = () => updateMass();
+
+function updateForce() {
+    force = +sliders.force.value;
+    displays.force.textContent = `${force} N`;
+}
+
+function updateAngle() {
+    angleDeg = +sliders.angle.value;
+    displays.angle.textContent = `${angleDeg}°`;
+}
+
+function updateMass() {
+    mass = +sliders.mass.value;
+    displays.mass.textContent = `${mass} kg`;
+}
+
+// Start simulation
+function startSimulation() {
+    document.querySelector('.concepts-section').style.display = 'none';
+    document.getElementById('simulationSection').style.display = 'block';
+    
+    setTimeout(() => {
+        resizeCanvas();
+        bgImage.onload = resizeCanvas;
+        window.addEventListener('resize', resizeCanvas);
+        requestAnimationFrame(animate);
+    }, 500);
+}
+
+function resetAll() {
+    block = { x: 100, y: 420, width: 50, height: 50, color: '#ef4444', vx: 0, vy: 0, trail: [] };
+    force = 20; angleDeg = 30; mass = 5; totalDistance = 0; startTime = 0;
+    sliders.force.value = 20;
+    sliders.angle.value = 30;
+    sliders.mass.value = 5;
+    updateForce();
+    updateAngle();
+    updateMass();
+    
+    // Show concepts again
+    document.getElementById('simulationSection').style.display = 'none';
+    document.querySelector('.concepts-section').style.display = 'block';
+}
+
+// Main animation loop
+function animate(timestamp) {
+    if (!prevTime) {
+        prevTime = timestamp;
+        startTime = timestamp;
+    }
+    const dt = Math.min((timestamp - prevTime) / 1000, 0.016); // Cap at 60fps
+    prevTime = timestamp;
+    const timeElapsed = (timestamp - startTime) / 1000;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Update trail
+    block.trail.push({x: block.x, y: block.y});
+    if (block.trail.length > 20) block.trail.shift();
+
+    // Physics calculations
+    const angleRad = angleDeg * Math.PI / 180;
+    const fx = force * Math.cos(angleRad);
+    const fy = -force * Math.sin(angleRad); // Negative for upward
+
+    // Acceleration
+    const ax = fx / mass;
+    const ay = fy / mass - 0.1; // Slight gravity effect
+
+    // Update velocity
+    block.vx += ax * dt;
+    block.vy += ay * dt;
+
+    // Boundary and ramp physics (simplified)
+    if (block.y > canvas.height - block.height - 50) {
+        block.y = canvas.height - block.height - 50;
+        block.vy *= -0.3; // Bounce
+    }
+
+    // Update position
+    block.x += block.vx * dt;
+    block.y += block.vy * dt;
+    totalDistance += Math.hypot(block.vx, block.vy) * dt;
+
+    // Boundary check
+    if (block.x > canvas.width - block.width) {
+        block.x = canvas.width - block.width;
+        block.vx *= -0.5;
+    }
+
+    // Calculations
+    const workDone = force * totalDistance * Math.cos(angleRad);
+    const power = workDone / Math.max(timeElapsed, 0.1);
+    const speed = Math.hypot(block.vx, block.vy);
+    const ke = 0.5 * mass * speed * speed;
+    const pe = mass * 9.8 * (canvas.height - block.y - block.height / 2) / 100;
+
+    // Draw trail
+    block.trail.forEach((point, i) => {
+        ctx.save();
+        ctx.globalAlpha = i / 20 * 0.6;
+        ctx.fillStyle = '#3b82f6';
+        ctx.beginPath();
+        ctx.arc(point.x + 25, point.y + 25, 8 - i/3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+
+    // Draw block with glow
+    const gradient = ctx.createRadialGradient(block.x + 25, block.y + 25, 0, block.x + 25, block.y + 25, 30);
+    gradient.addColorStop(0, 'rgba(239,68,68,0.9)');
+    gradient.addColorStop(1, 'rgba(239,68,68,0)');
+    
+    ctx.shadowColor = '#ef4444';
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = gradient;
+    ctx.fillRect(block.x, block.y, block.width, block.height);
+    ctx.shadowBlur = 0;
+
+    // Force vector visualization
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.shadowColor = '#3b82f6';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(block.x + 25, block.y + 25);
+    ctx.lineTo(block.x + 25 + fx * 3, block.y + 25 + fy * 3);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Update displays
+    displays.work.textContent = workDone.toFixed(1);
+    displays.power.textContent = power.toFixed(1);
+    displays.ke.textContent = ke.toFixed(1);
+    displays.pe.textContent = pe.toFixed(1);
+
+    animationId = requestAnimationFrame(animate);
+}
+</script>
+
+</body>
+</html>
