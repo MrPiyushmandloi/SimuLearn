@@ -235,3 +235,18 @@ footer {
     section { padding: 4rem 0; }
     .features { grid-template-columns: 1fr; }
 }
+.periodic {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #11b8d1, #36075c);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.periodic:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34,211,238,0.35);
+}
+
